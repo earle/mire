@@ -1,4 +1,5 @@
-(ns mire.rooms)
+(ns mire.rooms
+  (:require [mire.player :as player]))
 
 (def rooms (ref {}))
 
@@ -30,3 +31,11 @@
 (defn room-contains?
   [room thing]
   (@(:items room) (keyword thing)))
+
+(defn tell-room
+  "Send a message to all inhabitants in a room."
+  [room message]
+  (doseq [inhabitant (disj @(:inhabitants @player/*current-room*)
+                           player/*name*)]
+    (binding [*out* (player/streams inhabitant)]
+      (println message))))

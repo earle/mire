@@ -13,7 +13,7 @@
      (commands/discard item))
    (commute player/streams dissoc player/*name*)
    (commute (:inhabitants @player/*current-room*)
-            disj player/player/*name*)))
+            disj player/*name*)))
 
 (defn- get-unique-player-name [name]
   (if (@player/streams name)
@@ -41,7 +41,7 @@
 
       (try (loop [input (read-line)]
              (when input
-               (println (commands/execute input))
+               (if-let [s (commands/execute input)] (println s))
                (.flush *err*)
                (print player/prompt) (flush)
                (recur (read-line))))
@@ -49,8 +49,11 @@
 
 (defn -main
   ([port dir]
-     (rooms/add-rooms dir)
-     (defonce server (socket/create-server (Integer. port) mire-handle-client))
-     (println "Launching Mire server on port" port))
+
+   (rooms/add-rooms dir)
+   (defonce server (socket/create-server (Integer. port) mire-handle-client))
+   (println "Launching Mire server on port" port))
+
   ([port] (-main port "resources/rooms"))
+
   ([] (-main 3333)))

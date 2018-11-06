@@ -42,6 +42,7 @@
      (do (move-between-refs (keyword thing)
                             (:items @player/*current-room*)
                             player/*inventory*)
+         (rooms/tell-room @player/*current-room* (str player/*name* " picked up a " thing "."))
          (str "You picked up the " thing "."))
      (str "There isn't any " thing " here."))))
 
@@ -53,6 +54,7 @@
      (do (move-between-refs (keyword thing)
                             player/*inventory*
                             (:items @player/*current-room*))
+         (rooms/tell-room @player/*current-room* (str player/*name* " dropped a " thing "."))
          (str "You dropped the " thing "."))
      (str "You're not carrying a " thing "."))))
 
@@ -76,12 +78,8 @@
   "Say something out loud so everyone in the room can hear."
   [& words]
   (let [message (str/join " " words)]
-    (doseq [inhabitant (disj @(:inhabitants @player/*current-room*)
-                             player/*name*)]
-      (binding [*out* (player/streams inhabitant)]
-        (println message)
-        (println player/prompt)))
-    (str "You said " message)))
+    (rooms/tell-room @player/*current-room* (str player/*name* " says: " message))
+    (str "You said: " message)))
 
 (defn help
   "Show available commands and what they do."
@@ -111,7 +109,11 @@
   "Execute a command that is passed to us."
   [input]
   (try (let [[command & args] (.split input " +")]
-         (apply (commands command) args))
+         (if (contains? commands command)
+           (apply (commands command) args)
+           (if-not (str/blank? command)
+             (str "You can't do that!"))))
+
        (catch Exception e
          (.printStackTrace e (new java.io.PrintWriter *err*))
-         "You can't do that!")))
+         "Ooops! Something went terribly wrong.")))
