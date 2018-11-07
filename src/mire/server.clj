@@ -35,10 +35,12 @@
               player/*inventory* (ref #{})]
       (dosync
        (commute (:inhabitants @player/*current-room*) conj player/*name*)
-       (commute player/streams assoc player/*name* *out*))
+       (commute player/streams assoc player/*name* *out*)
+       (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
 
       (println (commands/look)) (print player/prompt) (flush)
 
+      ;; Main REPL loop
       (try (loop [input (read-line)]
              (when input
                (if-let [s (commands/execute input)] (println s))

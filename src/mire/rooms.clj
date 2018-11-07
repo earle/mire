@@ -35,7 +35,6 @@
 (defn tell-room
   "Send a message to all inhabitants in a room."
   [room message]
-  (doseq [inhabitant (disj @(:inhabitants @player/*current-room*)
-                           player/*name*)]
+  (doseq [inhabitant (disj @(:inhabitants @player/*current-room*) player/*name*)]
     (binding [*out* (player/streams inhabitant)]
       (println message))))

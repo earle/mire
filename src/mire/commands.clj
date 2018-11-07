@@ -10,7 +10,6 @@
   (alter to conj obj))
 
 ;; Command functions
-
 (defn look
   "Get a description of the surrounding environs and its contents."
   []
@@ -30,8 +29,12 @@
          (move-between-refs player/*name*
                             (:inhabitants @player/*current-room*)
                             (:inhabitants target))
+         (rooms/tell-room @player/*current-room* (str player/*name* " went " (name direction) "."))
+
          (ref-set player/*current-room* target)
+         (rooms/tell-room @player/*current-room* (str player/*name* " arrived."))
          (look))
+
        "You can't go that way."))))
 
 (defn grab
@@ -91,15 +94,20 @@
 ;; Command data
 
 (def commands {"move" move,
+               "n" (fn [] (move :north)),
                "north" (fn [] (move :north)),
+               "s" (fn [] (move :south)),
                "south" (fn [] (move :south)),
+               "e" (fn [] (move :east)),
                "east" (fn [] (move :east)),
+               "w" (fn [] (move :west)),
                "west" (fn [] (move :west)),
                "grab" grab
                "discard" discard
                "inventory" inventory
                "detect" detect
                "look" look
+               "l" look
                "say" say
                "help" help})
 
