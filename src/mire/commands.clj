@@ -37,6 +37,25 @@
 
        "You can't go that way."))))
 
+(defn teleport
+  "Teleport to a Room"
+  [name]
+  (dosync
+    (let [target (@rooms/rooms (keyword name))]
+      (if target
+        (do
+          (move-between-refs player/*name*
+                             (:inhabitants @player/*current-room*)
+                             (:inhabitants target))
+          (rooms/tell-room @player/*current-room* (str player/*name* " disappeared in a cloud of smoke."))
+          (ref-set player/*current-room* target)
+          (rooms/tell-room @player/*current-room* (str player/*name* " arrived in a cloud of smoke."))
+          (look))
+
+          "No such room."))))
+
+
+
 (defn grab
   "Pick something up."
   [thing]
@@ -109,10 +128,10 @@
                "look" look
                "l" look
                "say" say
+               "teleport" teleport
                "help" help})
 
 ;; Command handling
-
 (defn execute
   "Execute a command that is passed to us."
   [input]
