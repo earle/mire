@@ -3,14 +3,13 @@
             [server.socket :as socket]
             [mire.player :as player]
             [mire.commands :as commands]
-            [mire.player :as player]
             [mire.rooms :as rooms]))
 
 (defn- cleanup []
   "Drop all inventory and remove player from room and player list."
   (dosync
    (doseq [item @player/*inventory*]
-     (commands/discard item))
+     (commands/execute (str "discard " item)))
    (commute player/streams dissoc player/*name*)
    (commute (:inhabitants @player/*current-room*)
             disj player/*name*)))
@@ -38,7 +37,7 @@
        (commute player/streams assoc player/*name* *out*)
        (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
 
-      (println (commands/look)) (print player/prompt) (flush)
+      (println (commands/execute "look")) (print player/prompt) (flush)
 
       ;; Main REPL loop
       (try (loop [input (read-line)]
@@ -51,11 +50,11 @@
 
 (defn -main
   ([port dir]
-
-   (rooms/add-rooms dir)
+   (rooms/add-rooms (str dir "/rooms"))
+   (commands/add-commands (str dir "/commands"))
    (defonce server (socket/create-server (Integer. port) mire-handle-client))
    (println "Launching Mire server on port" port))
 
-  ([port] (-main port "resources/rooms"))
+  ([port] (-main port "resources"))
 
   ([] (-main 3333)))

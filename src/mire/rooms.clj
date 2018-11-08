@@ -32,9 +32,19 @@
   [room thing]
   (@(:items room) (keyword thing)))
 
+(defn others-in-room
+  "Other people in the current room"
+  []
+  (disj @(:inhabitants @player/*current-room*) player/*name*))
+
+(defn items-in-room
+  "Items in this room"
+  []
+  @(:items @player/*current-room*))
+
 (defn tell-room
   "Send a message to all inhabitants in a room."
   [room message]
-  (doseq [inhabitant (disj @(:inhabitants @player/*current-room*) player/*name*)]
+  (doseq [inhabitant (others-in-room)]
     (binding [*out* (player/streams inhabitant)]
       (println message))))
