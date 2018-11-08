@@ -4,7 +4,23 @@
             [mire.object :as object]
             [mire.player :as player]))
 
+;; Commands (dynamically loaded from individual files)
 (def commands (ref {}))
+
+;; Aliases for commands
+(def aliases { "n" "move north",
+               "north" "move north",
+               "s" "move south",
+               "south" "move south"
+               "e" "move east",
+               "east" "move east"
+               "w" "move west",
+               "west" "move west"
+               "get" "grab",
+               "drop" "discard",
+               "i" "inventory"
+               "l" "look"})
+
 
 (defn load-command
   "Load command from files"
@@ -12,15 +28,19 @@
   (let [filename (.getName file)
         command (first (str/split filename #"\."))]
     (println (str "Loading: '" command "' from: " (.getAbsolutePath file)))
-    (load-file (.getAbsolutePath file))
-    (conj commands { command (symbol command)})))
+    (-> file
+        .getAbsolutePath
+        load-file)
+    (conj commands { command (symbol (str "user/" command))})))
 
 (defn load-commands
   "Load commands from file tree."
   [commands dir]
   (dosync
     (reduce load-command commands
-           (.listFiles (java.io.File. dir)))))
+      (-> dir
+          java.io.File.
+          .listFiles))))
 
 (defn add-commands
   "Look through all the files in a dir for files and add
@@ -28,16 +48,6 @@
   [dir]
   (dosync
     (alter commands load-commands dir)))
-
-;; Command aliases
-(def aliases { "n" "move north",
-               "s" "move south",
-               "e" "move east",
-               "w" "move west",
-               "get" "grab",
-               "drop" "discard",
-               "i" "inventory"
-               "l" "look"})
 
 ;; Command handling
 (defn execute
@@ -49,10 +59,10 @@
            (let [[alias-command & alias-args] (.split alias " +")]
              ;; is there args in this alias?
              (if alias-args
-               ((resolve (symbol (str "user/" alias-command))) alias-args)
-               ((resolve (symbol (str "user/" alias))) args)))
+               ((resolve (@commands alias-command)) alias-args)
+               ((resolve (@commands alias)) args)))
            (if (contains? @commands command)
-             ((resolve (symbol (str "user/" command))) args)
+             ((resolve (@commands command)) args)
              (if-not (str/blank? command)
                (str "You can't do that!")))))
 
