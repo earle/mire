@@ -29,47 +29,40 @@
   (dosync
     (alter commands load-commands dir)))
 
-
 ;; Command functions
-
 (defn help
   "Show available commands and what they do."
   []
   (str/join "\n" (map #(str (key %) ": " (:doc (meta (val %))))
                       (dissoc (ns-publics 'mire.commands)
                               'execute 'commands))))
-;; Command data
-;;(def new_commands {"move" move,})
-                   ;;"n" (fn [] (move :north)),
-                   ;;"north" (fn [] (move :north)),
-                   ;;"s" (fn [] (move :south)),
-                   ;;"south" (fn [] (move :south)),
-                   ;;"e" (fn [] (move :east)),
-                   ;;"east" (fn [] (move :east)),
-                   ;;"w" (fn [] (move :west)),
-                   ;;"west" (fn [] (move :west)),
-                   ;;"grab" grab
-                   ;;"get" grab
-                   ;;"discard" discard
-                   ;;"drop" discard
-                   ;;"inventory" inventory
-                   ;; "i" inventory
-                   ;;"detect" detect
-                   ;;"look" look
-                   ;;"l" look
-                   ;;"say" say
-                   ;;"help" help})
+
+(def aliases { "n" "move north",
+               "s" "move south",
+               "e" "move east",
+               "w" "move west",
+               "get" "grab",
+               "drop" "discard",
+               "i" "inventory"
+               "l" "look"})
 
 ;; Command handling
 (defn execute
   "Execute a command that is passed to us."
   [input]
-  (try (let [[command & args] (.split input " +")]
-         (if (contains? @commands command)
-           ((resolve (symbol (str "user/" command))) args)
-           ;;(apply (@commands command) args)
-           (if-not (str/blank? command)
-             (str "You can't do that!"))))
+  (try (let [[command & args] (.split input " +")
+             alias (aliases command)]
+         (if alias
+           (let [[alias-command & alias-args] (.split alias " +")]
+             ;; is there args in this alias?
+             (if alias-args
+               ((resolve (symbol (str "user/" alias-command))) alias-args)
+               ((resolve (symbol (str "user/" alias))) args)))
+           (if (contains? @commands command)
+             ((resolve (symbol (str "user/" command))) args)
+             ;;(apply (@commands command) args)
+             (if-not (str/blank? command)
+               (str "You can't do that!")))))
 
        (catch Exception e
          (.printStackTrace e (new java.io.PrintWriter *err*))
