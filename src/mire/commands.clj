@@ -29,14 +29,7 @@
   (dosync
     (alter commands load-commands dir)))
 
-;; Command functions
-(defn help
-  "Show available commands and what they do."
-  []
-  (str/join "\n" (map #(str (key %) ": " (:doc (meta (val %))))
-                      (dissoc (ns-publics 'mire.commands)
-                              'execute 'commands))))
-
+;; Command aliases
 (def aliases { "n" "move north",
                "s" "move south",
                "e" "move east",
@@ -60,7 +53,6 @@
                ((resolve (symbol (str "user/" alias))) args)))
            (if (contains? @commands command)
              ((resolve (symbol (str "user/" command))) args)
-             ;;(apply (@commands command) args)
              (if-not (str/blank? command)
                (str "You can't do that!")))))
 
