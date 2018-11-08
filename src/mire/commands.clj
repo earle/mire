@@ -21,7 +21,6 @@
                "i" "inventory"
                "l" "look"})
 
-
 (defn load-command
   "Load command from files"
   [commands file]
