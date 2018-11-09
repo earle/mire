@@ -1,6 +1,6 @@
 # Mire
 
-It's a nonviolent MUD. (Multi-User Dungeon)
+Forked from https://github.com/technomancy/mire
 
 ## Usage
 
@@ -11,6 +11,18 @@ Install [Leiningen](http://leiningen.org) if you haven't already:
 
 Then do `lein run` inside the Mire directory to launch the Mire
 server. Then players can connect by telnetting to port 3333.
+
+## Commands
+
+In game commands are defined in `resources/commands` with each command having
+it's own file and loaded in the `user` namespace.
+
+Aliases are temporarily defined in `src/mire/commands.clj`
+
+## Rooms
+
+Rooms are defined as objects inside of files in `resources/rooms`. Rooms are
+keyed by their `:name` property across all files.
 
 ## Motivation
 
