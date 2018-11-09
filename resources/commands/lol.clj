@@ -15,7 +15,7 @@
         (if (contains? @(:inhabitants @player/*current-room*) name)
           (if (= name player/*name*)
             (do
-              (rooms/tell-room @player/*current-room* (str player/*name* " laughs out themself."))
+              (rooms/tell-room @player/*current-room* (str player/*name* " laughs at themself."))
               (str "You laugh at yourself."))
             (do
               (rooms/tell-room @player/*current-room* (str player/*name* " laughs at " name ".") name)
