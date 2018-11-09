@@ -19,6 +19,23 @@ it's own file and loaded in the `user` namespace.
 
 Aliases are temporarily defined in `src/mire/commands.clj`
 
+Example command `grab`:
+
+```Clojure
+(defn grab
+  "Pick something up."
+  [args]
+  (dosync
+    (let [thing (first args)]
+      (if (rooms/room-contains? @player/*current-room* thing)
+        (do (object/move-between-refs (keyword thing)
+                               (:items @player/*current-room*)
+                               player/*inventory*)
+            (rooms/tell-room @player/*current-room* (str player/*name* " picked up a " thing "."))
+            (str "You picked up the " thing "."))
+        (str "There isn't any " thing " here.")))))
+```
+
 ## Rooms
 
 Rooms are defined as objects inside of files in `resources/rooms`. Rooms are
