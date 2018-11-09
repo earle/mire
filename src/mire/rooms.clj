@@ -3,7 +3,7 @@
 
 (def rooms (ref {}))
 
-(defn create-room
+(defn- create-room
   "Create a room from a object"
   [rooms file obj]
   (let [room {(keyword (:name obj)) {:file (keyword (.getName file))
@@ -13,13 +13,13 @@
                                       :inhabitants (ref #{})}}]
     (conj rooms room)))
 
-(defn load-room [rooms file]
+(defn- load-room [rooms file]
   "Load a list of room objects from a file."
   (println "Loading Rooms from: " (.getAbsolutePath file))
   (let [objs (read-string (slurp (.getAbsolutePath file)))]
     (into {} (map #(create-room rooms file %) objs))))
 
-(defn load-rooms
+(defn- load-rooms
   "Given a dir, return a map with an entry corresponding to each file
   in it. Files should be lists of maps containing room data."
   [rooms dir]
