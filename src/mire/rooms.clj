@@ -50,8 +50,8 @@
   @(:items @player/*current-room*))
 
 (defn tell-room
-  "Send a message to all inhabitants in a room."
-  [room message]
-  (doseq [inhabitant (others-in-room)]
+  "Send a message to all inhabitants in a room; optionally exclude"
+  [room message & exclude]
+  (doseq [inhabitant (disj (others-in-room) (first exclude))]
     (binding [*out* (player/streams inhabitant)]
       (println message))))

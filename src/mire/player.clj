@@ -9,3 +9,9 @@
 
 (defn carrying? [thing]
   (some #{(keyword thing)} @*inventory*))
+
+(defn tell-player
+  "Send a message to a specific player."
+  [player message]
+  (binding [*out* (streams player)]
+    (println message)))
