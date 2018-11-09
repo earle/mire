@@ -7,7 +7,7 @@
 ;; Commands (dynamically loaded from individual files)
 (def commands (ref {}))
 
-;; Aliases for commands
+;; Aliases for commands.  This needs to live somewhere else eventually
 (def aliases { "n" "move north",
                "north" "move north",
                "s" "move south",
@@ -26,7 +26,7 @@
   [commands file]
   (let [filename (.getName file)
         command (first (str/split filename #"\."))]
-    (println (str "Loading: '" command "' from: " (.getAbsolutePath file)))
+    (println (str "Loading Command: '" command "' from: " (.getAbsolutePath file)))
     (-> file
         .getAbsolutePath
         load-file)
@@ -43,7 +43,7 @@
 
 (defn add-commands
   "Look through all the files in a dir for files and add
-  them to the mire.commands/commands map."
+  them to the available commands map."
   [dir]
   (dosync
     (alter commands load-commands dir)))

@@ -3,23 +3,30 @@
 
 (def rooms (ref {}))
 
+(defn create-room
+  "Create a room from a object"
+  [rooms file obj]
+  (let [room {(keyword (:name obj)) {:file (keyword (.getName file))
+                                      :desc (:desc obj)
+                                      :exits (ref (:exits obj))
+                                      :items (ref (or (:items obj) #{}))
+                                      :inhabitants (ref #{})}}]
+    (conj rooms room)))
+
 (defn load-room [rooms file]
-  (let [room (read-string (slurp (.getAbsolutePath file)))]
-    (conj rooms
-          {(keyword (.getName file))
-           {:name (keyword (.getName file))
-            :desc (:desc room)
-            :exits (ref (:exits room))
-            :items (ref (or (:items room) #{}))
-            :inhabitants (ref #{})}})))
+  "Load a list of room objects from a file."
+  (println "Loading Rooms from: " (.getAbsolutePath file))
+  (let [objs (read-string (slurp (.getAbsolutePath file)))]
+    (into {} (map #(create-room rooms file %) objs))))
 
 (defn load-rooms
   "Given a dir, return a map with an entry corresponding to each file
-  in it. Files should be maps containing room data."
+  in it. Files should be lists of maps containing room data."
   [rooms dir]
   (dosync
-   (reduce load-room rooms
-           (.listFiles (java.io.File. dir)))))
+   (reduce load-room rooms (-> dir
+                               java.io.File.
+                               .listFiles))))
 
 (defn add-rooms
   "Look through all the files in a dir for files describing rooms and add

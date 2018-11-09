@@ -1,5 +1,6 @@
 (ns mire.server
   (:require [clojure.java.io :as io]
+            [clojure.string :as str]
             [server.socket :as socket]
             [mire.player :as player]
             [mire.commands :as commands]
@@ -14,12 +15,17 @@
    (commute (:inhabitants @player/*current-room*)
             disj player/*name*)))
 
-(defn- get-unique-player-name [name]
-  (if (@player/streams name)
-    (do (print "That name is in use; try again: ")
+(defn- get-unique-player-name [s]
+  (let [name (str/capitalize s)]
+    (if (@player/streams name)
+      (do (print "That name is in use; try again: ")
         (flush)
         (recur (read-line)))
-    name))
+      (if (< (count name) 2)
+        (do (print "Choose a longer name; try again: ")
+          (flush)
+          (recur (read-line)))
+        name))))
 
 (defn- mire-handle-client [in out]
   (binding [*in* (io/reader in)
@@ -29,7 +35,7 @@
     ;; We have to nest this in another binding call instead of using
     ;; the one above so *in* and *out* will be bound to the socket
     (print "\nWhat is your name? ") (flush)
-    
+
     (binding [player/*name* (get-unique-player-name (read-line))
               player/*current-room* (ref (@rooms/rooms :start))
               player/*inventory* (ref #{})]
