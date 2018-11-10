@@ -1,5 +1,6 @@
 (ns mire.rooms
   (:require [mire.player :as player]
+            [mire.util :as util]
             [mire.items :as items]))
 
 (def rooms (ref {}))
@@ -14,8 +15,8 @@
                                       :items items
                                       :inhabitants (ref #{})}}]
 
-    (println "Room: " room)
-    (println "Items: " items)
+    ;;(println "Room: " room)
+    ;;(println "Items: " items)
     (conj rooms room)))
 
 (defn- load-room [rooms file]
@@ -42,7 +43,8 @@
 
 (defn room-contains?
   [room thing]
-  (some #(= thing %) (map #(:name (% @items/items)) @(:items room))))
+  (util/ref-contains? room thing))
+  ;;(some #(= thing %) (map #(:name (% @items/items)) @(:items room))))
 
 (defn others-in-room
   "Other people in the current room"
@@ -52,18 +54,17 @@
 (defn items-in-room
   "Items in this room"
   [room]
-  (select-keys @items/items @(:items room)))
+  (util/items-in-ref room))
 
 (defn find-items-in-room
   "Find item refs by name from a room"
   [room thing]
-  (filter #(= thing (:name (val %))) (items-in-room room)))
+  (util/find-items-in-ref room thing))
 
 (defn get-item-in-room
   "Get the first item in room by name"
   [room thing]
-  (keyword (first (first (find-items-in-room room thing)))))
-
+  (util/get-item-in-ref room thing))
 
 (defn tell-room
   "Send a message to all inhabitants in a room; optionally exclude"

@@ -12,7 +12,7 @@
   (dosync
     (let [thing (first args)]
       (if (rooms/room-contains? @player/*current-room* thing)
-        (let [item (rooms/get-item-in-room @player/*current-room* thing)]
+        (let [item (util/get-item-in-ref @player/*current-room* thing)]
           (do
             (util/move-between-refs item
                                     (:items @player/*current-room*)

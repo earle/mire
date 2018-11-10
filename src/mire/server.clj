@@ -7,6 +7,8 @@
             [mire.commands :as commands]
             [mire.rooms :as rooms]))
 
+(def players (ref {}))
+
 (defn- cleanup []
   "Drop all inventory and remove player from room and player list."
   (dosync
@@ -36,6 +38,9 @@
     ;; We have to nest this in another binding call instead of using
     ;; the one above so *in* and *out* will be bound to the socket
     (print "\nWhat is your name? ") (flush)
+
+    ;; get this players name, create player object, add to list of players
+    ;; create binding shortcuts for name and inventory
 
     (binding [player/*name* (get-unique-player-name (read-line))
               player/*current-room* (ref (@rooms/rooms :start))
