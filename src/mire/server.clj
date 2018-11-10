@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [server.socket :as socket]
             [mire.player :as player]
+            [mire.items :as items]
             [mire.commands :as commands]
             [mire.rooms :as rooms]))
 
@@ -57,6 +58,8 @@
 
 (defn -main
   ([port dir]
+   (items/add-items (str dir "/items"))
+   (println "Added Items:" items/all-items)
    (rooms/add-rooms (str dir "/rooms"))
    (commands/add-commands (str dir "/commands"))
    (defonce server (socket/create-server (Integer. port) mire-handle-client))

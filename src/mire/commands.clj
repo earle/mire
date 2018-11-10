@@ -1,7 +1,6 @@
 (ns mire.commands
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
-            [mire.object :as object]
             [mire.player :as player]))
 
 ;; Commands (dynamically loaded from individual files)

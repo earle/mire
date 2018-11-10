@@ -1,6 +1,6 @@
 (ns user
   (:require [clojure.string :as str]
-            [mire.object :as object]
+            [mire.util :as util]
             [mire.rooms :as rooms]
             [mire.player :as player]))
 
@@ -10,7 +10,7 @@
   (dosync
     (let [thing (first args)]
       (if (player/carrying? thing)
-        (do (object/move-between-refs (keyword thing)
+        (do (util/move-between-refs (keyword thing)
                                player/*inventory*
                                (:items @player/*current-room*))
             (rooms/tell-room @player/*current-room* (str player/*name* " dropped a " thing "."))

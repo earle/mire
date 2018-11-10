@@ -1,6 +1,5 @@
 (ns user
   (:require [clojure.string :as str]
-            [mire.object :as object]
             [mire.rooms :as rooms]
             [mire.player :as player]))
 

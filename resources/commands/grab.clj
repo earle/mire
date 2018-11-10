@@ -1,7 +1,8 @@
 (ns user
   (:require [clojure.string :as str]
-            [mire.object :as object]
+            [mire.util :as util]
             [mire.rooms :as rooms]
+            [mire.items :as items]
             [mire.player :as player]))
 
 
@@ -11,9 +12,11 @@
   (dosync
     (let [thing (first args)]
       (if (rooms/room-contains? @player/*current-room* thing)
-        (do (object/move-between-refs (keyword thing)
-                               (:items @player/*current-room*)
-                               player/*inventory*)
+        (let [item (rooms/get-item-in-room @player/*current-room* thing)]
+          (do
+            (util/move-between-refs item
+                                    (:items @player/*current-room*)
+                                    player/*inventory*)
             (rooms/tell-room @player/*current-room* (str player/*name* " picked up a " thing "."))
-            (str "You picked up the " thing "."))
+            (str "You picked up the " thing ".")))
         (str "There isn't any " thing " here.")))))

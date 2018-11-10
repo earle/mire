@@ -1,7 +1,7 @@
 (ns user
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
-            [mire.object :as object]
+            [mire.util :as util]
             [mire.commands :as commands]
             [mire.player :as player]))
 
@@ -14,7 +14,7 @@
          target (@rooms/rooms target-name)]
      (if target
        (do
-         (object/move-between-refs player/*name*
+         (util/move-between-refs player/*name*
                             (:inhabitants @player/*current-room*)
                             (:inhabitants target))
          (rooms/tell-room @player/*current-room* (str player/*name* " went " (name direction) "."))

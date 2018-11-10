@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
             [mire.commands :as commands]
-            [mire.object :as object]
+            [mire.util :as util]
             [mire.player :as player]))
 
 (defn teleport
@@ -12,7 +12,7 @@
     (let [target (@rooms/rooms (keyword (first args)))]
       (if target
         (do
-          (object/move-between-refs player/*name*
+          (util/move-between-refs player/*name*
                              (:inhabitants @player/*current-room*)
                              (:inhabitants target))
           (rooms/tell-room @player/*current-room* (str player/*name* " disappeared in a cloud of smoke."))
