@@ -35,8 +35,14 @@
   "Create a player"
   [name]
   {(keyword name) {:name name
-                    :current-room (ref (@rooms/rooms :start))
-                    :items (ref #{})}})
+                   :race "Human"
+                   :class "Magician"
+                   :level 1
+                   :hp 30
+                   :mana 20
+                   :exp 0
+                   :current-room (ref (@rooms/rooms :start))
+                   :items (ref #{})}})
 
 (defn- mire-handle-client [in out]
   (binding [*in* (io/reader in)

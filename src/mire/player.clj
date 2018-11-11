@@ -34,3 +34,9 @@
   [name obj]
   (dosync
     (alter players conj obj)))
+
+(defn remove-player
+  "Remove a Player from the Game"
+  [name obj]
+  (dosync
+    (alter players disj obj)))

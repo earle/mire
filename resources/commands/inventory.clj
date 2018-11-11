@@ -7,4 +7,7 @@
   "See what you've got."
   [args]
   (str "You are carrying:\n"
-       (str/join "\n" (map items/item-name (seq @player/*inventory*)))))
+    (if (> (count @player/*inventory*) 0)
+       (str/join "\n"
+           (map items/item-name (seq @player/*inventory*)))
+       (str "nothing."))))

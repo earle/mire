@@ -10,7 +10,7 @@
   "Pick something up."
   [args]
   (dosync
-    (let [thing (first args)]
+    (let [thing (str/join " " args)]
       (if (rooms/room-contains? @player/*current-room* thing)
         (let [item (util/get-item-in-ref @player/*current-room* thing)]
           (do

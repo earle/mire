@@ -1,6 +1,6 @@
 # Mire
 
-Forked from https://github.com/technomancy/mire
+Hacking on this for fun -- originally forked from https://github.com/technomancy/mire
 
 ## Usage
 
@@ -17,7 +17,7 @@ server. Then players can connect by telnetting to port 3333.
 In game commands are defined in `resources/commands` with each command having
 it's own file and loaded in the `user` namespace.
 
-Aliases are temporarily defined in `src/mire/commands.clj`
+Command aliases are temporarily defined in `src/mire/commands.clj`
 
 Example command `grab`:
 

@@ -18,7 +18,7 @@
   [thing]
   (if (valid-item? thing)
     (let [item (all-items (keyword thing))
-           k (keyword (str (rand-int 3000)))]
+           k (keyword (str (count @items)))]
       (dosync
         (alter items conj { k item})
         (keyword k)))
