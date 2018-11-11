@@ -12,6 +12,14 @@
 (def players (ref {}))
 (def streams (ref {}))
 
+(defn create-player
+  "Create a player"
+  [name]
+  {(keyword name) {:name name
+                   :sex "male"
+                   :current-room (ref #{})
+                   :items (ref #{})}})
+
 (defn items-in-inventory
   "Items in this players inventory"
   []

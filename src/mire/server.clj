@@ -31,19 +31,6 @@
           (recur (read-line)))
         name))))
 
-(defn- create-player
-  "Create a player"
-  [name]
-  {(keyword name) {:name name
-                   :race "Human"
-                   :class "Magician"
-                   :level 1
-                   :hp 30
-                   :mana 20
-                   :exp 0
-                   :current-room (ref (@rooms/rooms :start))
-                   :items (ref #{})}})
-
 (defn- mire-handle-client [in out]
   (binding [*in* (io/reader in)
             *out* (io/writer out)
@@ -52,7 +39,7 @@
     (print "\nWhat is your name? ") (flush)
 
     (let [name (get-unique-player-name (read-line))
-          obj (create-player name)]
+          obj (player/create-player name)]
 
       ;; Add this player to the game
       (player/add-player name obj)
@@ -64,6 +51,7 @@
                 player/*current-room* (:current-room (@player/players (keyword name)))
                 player/*inventory* (:items (@player/players (keyword name)))]
         (dosync
+          (ref-set player/*current-room* (@rooms/rooms :start))
           (commute (:inhabitants @player/*current-room*) conj player/*name*)
           (commute player/streams assoc player/*name* *out*)
           (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
