@@ -15,7 +15,8 @@ server. Then players can connect by telnetting to port 3333.
 ## Commands
 
 In game commands are defined in `resources/commands` with each command having
-it's own file and loaded in the `user` namespace.
+it's own file and loaded in the `user` namespace. A command returns a string
+which is output to the users stream.
 
 Command aliases are temporarily defined in `src/mire/commands.clj`
 
