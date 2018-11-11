@@ -1,7 +1,7 @@
 [{ :name "start"
    :desc "You are in a round room with a pillar in the middle."
    :exits {:north :closet :south :hallway}
-   :items [:dagger :battle-axe :dagger]}
+   :items [:fountain :dagger :battle-axe :dagger]}
 
 
  { :name "closet"

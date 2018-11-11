@@ -3,6 +3,19 @@
 (def all-items (ref {}))
 (def items (ref {}))
 
+(defn get-item
+  "Get an item"
+  [item]
+  (item @items))
+
+(defn moveable?
+  "Is this item moveable?"
+  [k]
+  (let [item (get-item k)]
+    (if (contains? item :moveable)
+      (:moveable item)
+      true)))
+
 (defn item-name
   "Get the display name of an item"
   [item]
