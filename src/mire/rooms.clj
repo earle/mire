@@ -44,7 +44,6 @@
 (defn room-contains?
   [room thing]
   (util/ref-contains? room thing))
-  ;;(some #(= thing %) (map #(:name (% @items/items)) @(:items room))))
 
 (defn others-in-room
   "Other people in the current room"

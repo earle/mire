@@ -4,6 +4,7 @@
             [server.socket :as socket]
             [mire.player :as player]
             [mire.items :as items]
+            [mire.util :as util]
             [mire.commands :as commands]
             [mire.rooms :as rooms]))
 
@@ -30,43 +31,59 @@
           (recur (read-line)))
         name))))
 
+(defn- create-player
+  "Create a player"
+  [name]
+  {(keyword name) {:name name
+                    :current-room (ref (@rooms/rooms :start))
+                    :items (ref #{})}})
+
 (defn- mire-handle-client [in out]
   (binding [*in* (io/reader in)
             *out* (io/writer out)
             *err* (io/writer System/err)]
 
-    ;; We have to nest this in another binding call instead of using
-    ;; the one above so *in* and *out* will be bound to the socket
     (print "\nWhat is your name? ") (flush)
 
-    ;; get this players name, create player object, add to list of players
-    ;; create binding shortcuts for name and inventory
+    (let [name (get-unique-player-name (read-line))
+          obj (create-player name)]
 
-    (binding [player/*name* (get-unique-player-name (read-line))
-              player/*current-room* (ref (@rooms/rooms :start))
-              player/*inventory* (ref #{})]
-      (dosync
-        (commute (:inhabitants @player/*current-room*) conj player/*name*)
-        (commute player/streams assoc player/*name* *out*)
-        (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
+      ;; Add this player to the game
+      (player/add-player name obj)
 
-      (println (commands/execute "look")) (print player/prompt) (flush)
+      ;; We have to nest this in another binding call instead of using
+      ;; the one above so *in* and *out* will be bound to the socket
+      (binding [player/*player* (@player/players (keyword name))
+                player/*name* name
+                player/*current-room* (:current-room (@player/players (keyword name)))
+                player/*inventory* (:items (@player/players (keyword name)))]
+        (dosync
+          (commute (:inhabitants @player/*current-room*) conj player/*name*)
+          (commute player/streams assoc player/*name* *out*)
+          (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
 
-      ;; Main REPL loop
-      (try (loop [input (read-line)]
-             (when input
-               (if-let [s (commands/execute input)] (println s))
-               (.flush *err*)
-               (print player/prompt) (flush)
-               (recur (read-line))))
-           (finally (cleanup))))))
+        (println (commands/execute "look")) (print player/prompt) (flush)
+
+        ;; Main REPL loop
+        (try (loop [input (read-line)]
+               (when input
+                 (if-let [s (commands/execute input)] (println s))
+                 (.flush *err*)
+                 (print player/prompt) (flush)
+                 (recur (read-line))))
+             (finally (cleanup)))))))
+
+(defn- init
+  [dir]
+  (items/add-items (str dir "/items"))
+  (println "Added Items:" items/all-items)
+  (rooms/add-rooms (str dir "/rooms"))
+  (commands/add-commands (str dir "/commands")))
+
 
 (defn -main
   ([port dir]
-   (items/add-items (str dir "/items"))
-   (println "Added Items:" items/all-items)
-   (rooms/add-rooms (str dir "/rooms"))
-   (commands/add-commands (str dir "/commands"))
+   (init dir)
    (defonce server (socket/create-server (Integer. port) mire-handle-client))
    (println "Launching Mire server on port" port))
 

@@ -10,7 +10,7 @@
   (dosync
     (let [thing (first args)]
       (if (player/carrying? thing)
-        (let [item (player/get-from-inventory thing)
+        (let [item (util/get-item-in-ref player/*player* thing)
               name (items/item-name item)]
           (do
             (util/move-between-refs item
