@@ -18,4 +18,5 @@
         (str "You see " (str/join ", " (map items/item-name items)) ".\n")
         (str ""))
       (if (> (count others) 0)
-        (str "Also here: " (str/join "," others) ".\n") (str "")))))
+        (str "Also here: " (str/join "," others) ".\n")
+        (str "")))))

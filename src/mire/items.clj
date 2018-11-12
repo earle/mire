@@ -35,7 +35,7 @@
       (dosync
         (alter items conj { k item})
         (keyword k)))
-    (println "Can't find " thing)))
+    (println "items/clone-item: Can't find " thing)))
 
 (defn- create-item
   "Create an item from a object"

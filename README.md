@@ -12,6 +12,12 @@ Install [Leiningen](http://leiningen.org) if you haven't already:
 Then do `lein run` inside the Mire directory to launch the Mire
 server. Then players can connect by telnetting to port 3333.
 
+## Design
+
+Rooms and Items are defined in files in `resources`. Rooms are loaded into the
+`@rooms/rooms` reference. Items are loaded into `@items/all-items`
+and individual instances of items are cloned into `@items/items`.
+
 ## Commands
 
 In game commands are defined in `resources/commands` with each command having
@@ -46,6 +52,23 @@ Example command `grab`:
             (str/join "\n" (for [[k obj] (util/items-in-ref @player/*current-room*)] (grab [(:name obj)])))
             (str "There isn't any " thing " here."))))
       (str "What do you want to get?"))))
+```
+
+## Players
+
+## Items
+
+Items are defined inside of files in `resources/items`. Each file contains a
+list of objects. Each Object has a `name` key which will be used as a `keyword`
+in the combined database of items -- these must be unique. An item can have
+aliases, and will render in rooms by it's `sdesc` field.
+
+```Clojure
+[
+ { :name "dagger" :sdesc "a dagger"}
+ { :name "battle-axe" :aliases [ "axe", "battle axe" ] :sdesc "a bronze battle axe"}
+ { :name "fountain" :sdesc "a fountain" :moveable false}
+]
 ```
 
 ## Rooms
