@@ -1,7 +1,8 @@
 (ns user
   (:require [clojure.string :as str]
             [mire.items :as items]
-            [mire.player :as player]))
+            [mire.player :as player]
+            [mire.util :as util]))
 
 (defn inventory
   "See what you've got."
@@ -9,5 +10,10 @@
   (str "You are carrying:\n"
     (if (> (count @player/*inventory*) 0)
        (str/join "\n"
-           (map items/item-name (seq @player/*inventory*)))
+         ;;(map util/count-and-pluralize (frequencies (map items/item-name (seq @player/*inventory*)))))
+         (->> @player/*inventory*
+             seq
+             (map items/item-name)
+             frequencies
+             (map util/count-and-pluralize)))
        (str "nothing."))))

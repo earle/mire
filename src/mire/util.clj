@@ -3,6 +3,23 @@
             [mire.items :as items]))
 
 
+(defn count-and-pluralize
+  "Count and pluralize for display"
+  [frequency]
+  (let [[name number] frequency]
+    (if (> number 1)
+      (str number " " name "s")
+      (str "a " name))))
+
+(defn comma-and-period
+  "One, Two, and Three."
+  [things]
+  (let [objs (frequencies things)]
+    (if (> (count objs) 1)
+      (str (str/join ", "
+             (map count-and-pluralize (butlast objs))) ", and " (count-and-pluralize (last objs)) ".")
+      (str (count-and-pluralize (first objs)) "."))))
+
 (defn items-in-ref
   "Items in this object"
   [obj]
