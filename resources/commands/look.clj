@@ -9,15 +9,14 @@
   "Get a description of the surrounding environs and its contents."
   [args]
   (if (> (count args) 0)
-    (let [thing (str/join " " args)]
-      (if (rooms/room-contains? @player/*current-room* thing)
-        (let [item (util/get-item-in-ref @player/*current-room* thing)
-              name (items/item-name item)]
+    (let [thing (str/replace (str/join " " args) #"(?i)^(in|into)\s+" "")]
+      (if-let [item (first (rooms/get! thing))]
+        (let [name (items/item-name item)]
           (if (items/container? item)
             (str "You see " (items/item-name item)
                  ", which contains:\n"
                  (if (> (count (items/contents item)) 0)
-                   (str "count:" (count @(:items @(items/get-item item))) ": " (:items @(items/get-item item)))
+                   (util/comma-and-period (map items/item-name (items/contents item)))
                    (str "nothing.")))
             (str "You see a " (items/item-name item) ".")))
         (str "There is no " thing " here.")))

@@ -65,6 +65,16 @@
   [room thing]
   (util/get-item-in-ref room thing))
 
+(defn get!
+  "Get an item and the player or room it came from"
+  [thing]
+  (if (player/carrying? thing)
+    [(util/get-item-in-ref player/*player* thing) player/*player*]
+    (if (room-contains? @player/*current-room* thing)
+      [(util/get-item-in-ref @player/*current-room* thing) @player/*current-room*]
+      nil)))
+
+
 (defn tell-room
   "Send a message to all inhabitants in a room; optionally exclude"
   [room message & exclude]
