@@ -8,10 +8,25 @@
   [item]
   (item @items))
 
+(defn container?
+  "Is this item a container of other items?"
+  [k]
+  (if-let [item (get-item k)]
+    (if (contains? item :container)
+      (:container item)
+      false)))
+
+(defn contents
+  "Contents of this item"
+  [k]
+  (if-let [item (get-item k)]
+    (if-let [objs @(:items item)]
+      objs)))
+
 (defn moveable?
   "Is this item moveable?"
   [k]
-  (let [item (get-item k)]
+  (if-let [item (get-item k)]
     (if (contains? item :moveable)
       (:moveable item)
       true)))
@@ -39,22 +54,26 @@
 
 (defn- create-item
   "Create an item from a object"
-  [db file obj]
-  (conj db {(keyword (:name obj)) obj}))
+  [items file obj]
+  (if (:container obj)
+    ;; If this is a container, clone default items into it
+    ;; XXX: have to post-process this since the items references may not be created yet
+    (conj items {(keyword (:name obj)) (assoc obj :items (ref #{}))})
+    (conj items {(keyword (:name obj)) obj})))
 
 (defn- load-item
   "Load a list of item objects from a file."
-  [db file]
+  [items file]
   (println "Loading Items from: " (.getAbsolutePath file))
   (let [objs (read-string (slurp (.getAbsolutePath file)))]
-    (into {} (map #(create-item db file %) objs))))
+    (into {} (map #(create-item items file %) objs))))
 
 (defn- load-items
   "Given a dir, return a map with an entry corresponding to each file
   in it. Files should be lists of maps containing room data."
-  [db dir]
+  [items dir]
   (dosync
-   (reduce load-item db (-> dir
+   (reduce load-item items (-> dir
                                java.io.File.
                                .listFiles))))
 
