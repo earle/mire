@@ -15,4 +15,5 @@
           (dosync
             (alter player/*inventory* conj item)
             (rooms/tell-room @player/*current-room* (str player/*name* " cloned " name "."))
-            (str "You cloned " item " " name)))))))
+            (str "You cloned " item " " name)))
+        (str "Specify a valid item to clone.")))))

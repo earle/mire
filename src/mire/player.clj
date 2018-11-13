@@ -1,5 +1,6 @@
 (ns mire.player
-  (:require [mire.util :as util]
+  (:require [clojure.string :as str]
+            [mire.util :as util]
             [mire.items :as items]))
 
 (def ^:dynamic *player*)
@@ -11,6 +12,11 @@
 
 (def players (ref {}))
 (def streams (ref {}))
+
+(defn get-player
+  "Get a Player by name"
+  [name]
+  ((keyword (str/capitalize name)) @players))
 
 (defn create-player
   "Create a player"
