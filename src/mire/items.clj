@@ -32,9 +32,22 @@
       true)))
 
 (defn item-name
-  "Get the display name of an item"
+  "Get the short description  of an item if it exists"
   [item]
-  (:sdesc (item @items)))
+  (if-let [item (item @items)]
+    (if (contains? item :sdesc)
+      (:sdesc item)
+      (:name item))
+    (:name item)))
+
+(defn item-desc
+  "Get the description of an item, if it exists"
+  [item]
+  (if-let [item (item @items)]
+    (if (contains? item :desc)
+      (:desc item)
+      (item-name item))
+    item))
 
 (defn valid-item?
   "Is this a valid item?"

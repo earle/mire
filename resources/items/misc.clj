@@ -1,3 +1,4 @@
-[{ :name "fountain" :sdesc "fountain" :moveable false}
+[{ :name "fountain" :sdesc "fountain" :moveable false
+   :desc "a large round marble fountain flowing with water"}
  { :name "rose" :aliases [ "red rose" ] :sdesc "red rose"}
  { :name "trunk" :sdesc "large trunk" :moveable false :container true}]

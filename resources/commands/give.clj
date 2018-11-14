@@ -5,15 +5,15 @@
             [mire.items :as items]
             [mire.player :as player]))
 
+;; Need to handle variations:
+;;   give axe to alice
+;;   give battle axe to alice
+;;   give axe alice
+;;   give battle axe alice
 
 (defn give
   "Give something to someone."
   [args]
-  ;; Need to handle variations:
-  ;;   give axe to alice
-  ;;   give battle axe to alice
-  ;;   give axe alice
-  ;;   give battle axe alice
   (if (> (count args) 0)
     (if-let [who (player/get-player (last args))]
       (if (contains? (rooms/others-in-room) (:name who))

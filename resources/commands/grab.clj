@@ -5,20 +5,20 @@
             [mire.items :as items]
             [mire.player :as player]))
 
+;; Need to handle:
+;; get key
+;; get golden key
+;; get key from box
+;; get key from big box
+;; get golden key in box
+;; get key from big box
+;; get all
+;; get all from box
+;; -- where box can be in the room, or in the players inventory
 
 (defn grab
   "Pick something up."
   [args]
-  ;; Need to handle:
-  ;; get key
-  ;; get golden key
-  ;; get key from box
-  ;; get key from big box
-  ;; get golden key in box
-  ;; get key from big box
-  ;; get all
-  ;; get all from box
-  ;; -- where box can be in the room, or in the players inventory
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
 

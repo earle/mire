@@ -6,20 +6,24 @@
             [mire.player :as player]))
 
 
+;; Need to handle variations:
+;;   put axe in box
+;;   put battle axe in box
+;;   put axe box
+;;   put battle axe box
+;; box can be in the room, or in the players inventory
+
 (defn put
   "Put something in something else."
   [args]
-  ;; Need to handle variations:
-  ;;   put axe in box
-  ;;   put battle axe in box
-  ;;   put axe box
-  ;;   put battle axe box
-  ;; box can be in the room, or in the players inventory
   (if (> (count args) 0)
     (let [target (last args)
           thing (str/replace (str/join " " (butlast args)) #"(?i)\s+(in|into)$" "")]
+      ;; does this container item exist in the room or inventory?
       (if-let [to (first (util/get-local target))]
+        ;; make sure the item is a container
         (if (items/container? to)
+          ;; does the item we're moving exist in the room or inventory?
           (if-let [[from from-ref] (util/get-local thing)]
             (dosync
               (util/move-between-refs from

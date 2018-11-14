@@ -29,29 +29,30 @@ Command aliases are temporarily defined in `src/mire/commands.clj`
 Example command `grab`:
 
 ```Clojure
-(defn grab
-  "Pick something up."
+(defn put
+  "Put something in something else."
   [args]
-  (dosync
-    (if (> (count args) 0)
-      (let [thing (str/join " " args)]
-        (if (rooms/room-contains? @player/*current-room* thing)
-          (let [item (util/get-item-in-ref @player/*current-room* thing)
-                name (items/item-name item)]
-            (if (items/moveable? item)
-              (do
-                (util/move-between-refs item
-                                        (:items @player/*current-room*)
-                                        player/*inventory*)
-                (rooms/tell-room @player/*current-room* (str player/*name* " picked up " name "."))
-                (str "You picked up " name "."))
-              (do
-                (rooms/tell-room @player/*current-room* (str player/*name* " tried to pick up " name ", and failed."))
-                (str "You can't pick up " name "."))))
-          (if (= thing "all")
-            (str/join "\n" (for [[k obj] (util/items-in-ref @player/*current-room*)] (grab [(:name obj)])))
-            (str "There isn't any " thing " here."))))
-      (str "What do you want to get?"))))
+  (if (> (count args) 0)
+    (let [target (last args)
+          thing (str/replace (str/join " " (butlast args)) #"(?i)\s+(in|into)$" "")]
+      ;; does this container item exist in the room or inventory?
+      (if-let [to (first (util/get-local target))]
+        ;; make sure the item is a container
+        (if (items/container? to)
+          ;; does the item we're moving exist in the room or inventory?
+          (if-let [[from from-ref] (util/get-local thing)]
+            (dosync
+              (util/move-between-refs from
+                                      (:items from-ref)
+                                      (:items (items/get-item to)))
+
+              (rooms/tell-room @player/*current-room*
+                               (str player/*name* " put a " (items/item-name from)
+                                    " into a " (items/item-name to) "."))
+              (str "You put a " (items/item-name from) " into a " (items/item-name to) "."))
+            (str "There isn't any " thing " here."))
+          (str "You can't put things into a " (items/item-name to) "."))
+        (str "There isn't any " target " here.")))))
 ```
 
 ## Players
@@ -62,6 +63,8 @@ Items are defined inside of files in `resources/items`. Each file contains a
 list of objects. Each Object has a `name` key which will be used as a `keyword`
 in the combined database of items -- these must be unique. An item can have
 aliases, and will render in rooms by it's `sdesc` field.
+
+If an item has `:container true` set then it can hold other items.
 
 ```Clojure
 [

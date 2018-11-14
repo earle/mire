@@ -24,7 +24,7 @@
             (str (if (= item-ref player/*player*)
                    (str "You are carrying ")
                    (str "You see "))
-                 (items/item-name item) ".")))
+                 (items/item-desc item) ".")))
         (str "There is no " thing " here.")))
     (let [exits (map name (keys @(:exits @player/*current-room*)))
           others (rooms/others-in-room)
