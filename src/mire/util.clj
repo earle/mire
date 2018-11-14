@@ -3,6 +3,10 @@
             [mire.player :as player]
             [mire.items :as items]))
 
+(defn in?
+  "true if coll contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
 
 (defn count-and-pluralize
   "Count and pluralize for display"
@@ -30,7 +34,7 @@
   "Find items by name or alias in an obj"
   [obj thing]
   ;;(println "find-items-in-ref: " (items-in-ref obj))
-  (for [[k i] (items-in-ref obj) :when (or (= thing (:name i)) (some #(= thing %) (:aliases i)))] k))
+  (for [[k i] (items-in-ref obj) :when (or (= thing (:name i)) (in? (:aliases i) thing))] k))
 
 (defn ref-contains?
   "Does an ref's :items contain an object by this name?"

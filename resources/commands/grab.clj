@@ -17,7 +17,7 @@
 ;; -- where box can be in the room, or in the players inventory
 
 (defn grab
-  "Pick something up."
+  "Pick something up"
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]

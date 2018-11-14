@@ -12,7 +12,7 @@
 ;;   give battle axe alice
 
 (defn give
-  "Give something to someone."
+  "Give something to someone"
   [args]
   (if (> (count args) 0)
     (if-let [who (player/get-player (last args))]

@@ -22,6 +22,7 @@
   [name]
   {(keyword name) {:name name
                    :sex "male"
+                   :last-command (ref #{})
                    :current-room (ref #{})
                    :items (ref #{})}})
 

@@ -1,7 +1,8 @@
 (ns mire.commands
   (:require [clojure.string :as str]
             [mire.rooms :as rooms]
-            [mire.player :as player]))
+            [mire.player :as player]
+            [mire.util :as util]))
 
 ;; Commands (dynamically loaded from individual files)
 (def commands (ref {}))
@@ -18,7 +19,8 @@
                "get" "grab",
                "drop" "discard",
                "i" "inventory"
-               "l" "look"})
+               "l" "look"
+               "!!" "bangbang"})
 
 (defn load-command
   "Load command from files"
@@ -47,12 +49,24 @@
   (dosync
     (alter commands load-commands dir)))
 
+;; Last Command -- prevent infinite recursion
+(defn set-last-command!
+  "Update last command"
+  [cmd]
+  (if-not (str/blank? cmd)
+    (if-not (util/in? ["!!" "bangbang"] (str/lower-case cmd))
+      (dosync
+        (ref-set (:last-command player/*player*) cmd)))))
+
 ;; Command handling
 (defn execute
   "Execute a command that is passed to us."
   [input]
   (try (let [[command & args] (.split input " +")
              alias (aliases command)]
+         ;; save last command
+         (set-last-command! input)
+
          (if alias
            (let [[alias-command & alias-args] (.split alias " +")]
              ;; is there args in this alias?

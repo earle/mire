@@ -61,9 +61,11 @@
         ;; Main REPL loop
         (try (loop [input (read-line)]
                (when input
-                 (if-let [s (commands/execute input)] (println s))
+                 (if-let [s (commands/execute input)]
+                   (println s))
                  (.flush *err*)
-                 (print player/prompt) (flush)
+                 (print player/prompt)
+                 (flush)
                  (recur (read-line))))
              (finally (cleanup)))))))
 
