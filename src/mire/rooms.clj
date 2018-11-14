@@ -1,22 +1,20 @@
 (ns mire.rooms
   (:require [mire.player :as player]
-            [mire.util :as util]
             [mire.items :as items]))
 
+;; state for all rooms
 (def rooms (ref {}))
 
 (defn- create-room
   "Create a room from a object"
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
-        room {(keyword (:name obj)) {:file (keyword (.getName file))
-                                      :desc (:desc obj)
-                                      :exits (ref (:exits obj))
-                                      :items items
-                                      :inhabitants (ref #{})}}]
-
-    ;;(println "Room: " room)
-    ;;(println "Items: " items)
+        room {(keyword (:name obj)) {:name (keyword (:name obj))
+                                     :file (keyword (.getName file))
+                                     :desc (:desc obj)
+                                     :exits (ref (:exits obj))
+                                     :items items
+                                     :inhabitants (ref #{})}}]
     (conj rooms room)))
 
 (defn- load-room [rooms file]
@@ -30,50 +28,21 @@
   in it. Files should be lists of maps containing room data."
   [rooms dir]
   (dosync
-   (reduce load-room rooms (-> dir
-                               java.io.File.
-                               .listFiles))))
+    (reduce load-room rooms (-> dir
+                                java.io.File.
+                                 .listFiles))))
 
 (defn add-rooms
   "Look through all the files in a dir for files describing rooms and add
   them to the mire.rooms/rooms map."
   [dir]
   (dosync
-   (alter rooms load-rooms dir)))
-
-(defn room-contains?
-  [room thing]
-  (util/ref-contains? room thing))
+    (alter rooms load-rooms dir)))
 
 (defn others-in-room
   "Other people in the current room"
   []
   (disj @(:inhabitants @player/*current-room*) player/*name*))
-
-(defn items-in-room
-  "Items in this room"
-  [room]
-  (util/items-in-ref room))
-
-(defn find-items-in-room
-  "Find item refs by name from a room"
-  [room thing]
-  (util/find-items-in-ref room thing))
-
-(defn get-item-in-room
-  "Get the first item in room by name"
-  [room thing]
-  (util/get-item-in-ref room thing))
-
-(defn get!
-  "Get an item and the player or room it came from"
-  [thing]
-  (if (player/carrying? thing)
-    [(util/get-item-in-ref player/*player* thing) player/*player*]
-    (if (room-contains? @player/*current-room* thing)
-      [(util/get-item-in-ref @player/*current-room* thing) @player/*current-room*]
-      nil)))
-
 
 (defn tell-room
   "Send a message to all inhabitants in a room; optionally exclude"

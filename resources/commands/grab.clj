@@ -23,7 +23,7 @@
     (let [thing (str/join " " args)]
 
       ;; Is this thing in the room?
-      (if (rooms/room-contains? @player/*current-room* thing)
+      (if (util/room-contains? @player/*current-room* thing)
         (let [item (util/get-item-in-ref @player/*current-room* thing)
               name (items/item-name item)]
           (if (items/moveable? item)
@@ -43,7 +43,7 @@
                 what (str/join "" (butlast things))]
 
             ;; does this container exist in the room or inventory?
-            (if-let [[from from-ref] (rooms/get! (last things))]
+            (if-let [[from from-ref] (util/get-local (last things))]
               ;; does this item exist in this container?
               (if-let [item (util/get-item-in-ref (items/get-item from) what)]
                 (dosync

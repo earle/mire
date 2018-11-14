@@ -18,9 +18,9 @@
   (if (> (count args) 0)
     (let [target (last args)
           thing (str/replace (str/join " " (butlast args)) #"(?i)\s+(in|into)$" "")]
-      (if-let [to (first (rooms/get! target))]
+      (if-let [to (first (util/get-local target))]
         (if (items/container? to)
-          (if-let [[from from-ref] (rooms/get! thing)]
+          (if-let [[from from-ref] (util/get-local thing)]
             (dosync
               (util/move-between-refs from
                                       (:items from-ref)

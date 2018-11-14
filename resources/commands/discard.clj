@@ -9,7 +9,7 @@
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
-      (if (player/carrying? thing)
+      (if (util/carrying? thing)
         (let [item (util/get-item-in-ref player/*player* thing)
               name (items/item-name item)]
           (dosync

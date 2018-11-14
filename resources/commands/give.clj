@@ -18,7 +18,7 @@
     (if-let [who (player/get-player (last args))]
       (if (contains? (rooms/others-in-room) (:name who))
         (let [thing (str/replace (str/join " " (butlast args)) #"(?i)\s+to$" "")]
-          (if (player/carrying? thing)
+          (if (util/carrying? thing)
             (let [item (util/get-item-in-ref player/*player* thing)
                   item-name (items/item-name item)]
               (dosync

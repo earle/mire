@@ -1,6 +1,5 @@
 (ns mire.player
   (:require [clojure.string :as str]
-            [mire.util :as util]
             [mire.items :as items]))
 
 (def ^:dynamic *player*)
@@ -30,12 +29,6 @@
   "Items in this players inventory"
   []
   (select-keys @items/items @*inventory*))
-
-(defn carrying?
-   "Is this player carrying something an item"
-  [thing]
-  (util/ref-contains? *player* thing))
-  ;;(> (count (find-in-inventory thing)) 0))
 
 (defn tell-player
   "Send a message to a specific player."

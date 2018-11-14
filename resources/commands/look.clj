@@ -10,7 +10,7 @@
   [args]
   (if (> (count args) 0)
     (let [thing (str/replace (str/join " " args) #"(?i)^(in|into)\s+" "")]
-      (if-let [[item item-ref] (rooms/get! thing)]
+      (if-let [[item item-ref] (util/get-local thing)]
         (let [name (items/item-name item)]
           (if (items/container? item)
             (str (if (= item-ref player/*player*)
@@ -32,7 +32,7 @@
       (str (:desc @player/*current-room*)
         "\nExits: " (str/join ", " exits) ".\n"
         (if (> (count items) 0)
-          (str "You see " (util/comma-and-period (map items/item-name items)) ".")
+          (str "You see " (util/comma-and-period (map items/item-name items)))
           (str ""))
         (if (> (count others) 0)
           (str "\nAlso here: " (str/join "," others) ".\n")

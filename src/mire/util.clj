@@ -1,5 +1,6 @@
 (ns mire.util
   (:require [clojure.string :as str]
+            [mire.player :as player]
             [mire.items :as items]))
 
 
@@ -40,6 +41,27 @@
   "Get the first item in obj by name"
   [obj thing]
   (keyword (first (find-items-in-ref obj thing))))
+
+(defn carrying?
+   "Is this player carrying something?"
+  [thing]
+  (ref-contains? player/*player* thing))
+  ;;(> (count (find-in-inventory thing)) 0))
+
+(defn room-contains?
+  "Does this room contain something?"
+  [room thing]
+  (ref-contains? room thing))
+
+(defn get-local
+  "Get an item from player inventory or current room"
+  [thing]
+  (if (carrying? thing)
+    [(get-item-in-ref player/*player* thing) player/*player*]
+    (if (room-contains? @player/*current-room* thing)
+      [(get-item-in-ref @player/*current-room* thing) @player/*current-room*]
+      nil)))
+
 
 (defn move-between-refs
   "Move instance of obj between from and to. Must call in a transaction."
