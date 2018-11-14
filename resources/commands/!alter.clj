@@ -17,15 +17,13 @@
       (if-let [k (if (= (first thing) \:)
                    (keyword (str/replace thing ":" ""))
                    (first (util/get-local thing)))]
-
         ;; grab this item and update field to value
         (if-let [item (items/get-item k)]
           (let [field (-> cmd first (str/replace ":" "") keyword)
                 value (read-string (str/join " " (next cmd)))]
-
-            ;; update the object
-            (assoc item field value))
-
+            ;; update the item instance
+            (dosync
+              (str k " " (pprint/write (k (alter items/items assoc-in [k field] value)) :stream nil))))
           (str "There item " k " doesn't exist."))
         (str "There isn't a " thing " to alter.")))
     (str "What do you want to alter?")))
