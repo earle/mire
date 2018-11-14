@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]
             [mire.commands :as commands]))
 
-(defn bangbang
+(defn !!
   "!!; Execute the last command again"
   [args]
   (if-let [last-command @(:last-command player/*player*)]

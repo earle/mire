@@ -1,0 +1,31 @@
+(ns user
+  (:require [clojure.string :as str]
+            [mire.util :as util]
+            [mire.items :as items]))
+
+;; Need to handle variations:
+;;   alter axe :sdesc this is an axe
+;;   alter :5 :sdesc this is an axe
+
+(defn !alter
+  "Alter the instance of an item"
+  [args]
+  (if (> (count args) 0)
+    (let [thing (first args)
+          cmd (rest args)]
+      ;; Is this thing a keyword or the name of something in the room/inventory?
+      (if-let [k (if (= (first thing) \:)
+                   (keyword (str/replace thing ":" ""))
+                   (first (util/get-local thing)))]
+
+        ;; grab this item and update field to value
+        (if-let [item (items/get-item k)]
+          (let [field (-> cmd first (str/replace ":" "") keyword)
+                value (read-string (str/join " " (next cmd)))]
+
+            ;; update the object
+            (assoc item field value))
+
+          (str "There item " k " doesn't exist."))
+        (str "There isn't a " thing " to alter.")))
+    (str "What do you want to alter?")))

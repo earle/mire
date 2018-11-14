@@ -20,7 +20,7 @@
                "drop" "discard",
                "i" "inventory"
                "l" "look"
-               "!!" "bangbang"})
+               "alter" "!alter"})
 
 (defn load-command
   "Load command from files"
@@ -53,10 +53,9 @@
 (defn set-last-command!
   "Update last command"
   [cmd]
-  (if-not (str/blank? cmd)
-    (if-not (util/in? ["!!" "bangbang"] (str/lower-case cmd))
-      (dosync
-        (ref-set (:last-command player/*player*) cmd)))))
+  (if (and (not (str/blank? cmd)) (not= "!!" (str/lower-case cmd)))
+    (dosync
+      (ref-set (:last-command player/*player*) cmd))))
 
 ;; Command handling
 (defn execute
