@@ -32,8 +32,8 @@
 
               (rooms/tell-room @player/*current-room*
                                (str player/*name* " put a " (items/item-name from)
-                                    " into a " (items/item-name to) "."))
-              (str "You put a " (items/item-name from) " into a " (items/item-name to) "."))
+                                    " into the " (items/item-name to) "."))
+              (str "You put a " (items/item-name from) " into the " (items/item-name to) "."))
             (str "There isn't any " thing " here."))
-          (str "You can't put things into a " (items/item-name to) "."))
+          (str "You can't put things into the " (items/item-name to) "."))
         (str "There isn't any " target " here.")))))

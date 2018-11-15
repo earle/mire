@@ -5,7 +5,7 @@
             [mire.player :as player]))
 
 (defn clone
-  "Clone an item into callers inventory"
+  "Clone an item"
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
@@ -14,6 +14,6 @@
               name (:sdesc (items/get-item item))]
           (dosync
             (alter player/*inventory* conj item)
-            (rooms/tell-room @player/*current-room* (str player/*name* " cloned " name "."))
-            (str "You cloned " name " (" item ")")))
+            (rooms/tell-room @player/*current-room* (str player/*name* " cloned a " name "."))
+            (str "You cloned a " name " (" item ")")))
         (str "Specify a valid item to clone.")))))

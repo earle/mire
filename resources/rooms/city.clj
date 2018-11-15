@@ -6,7 +6,7 @@
  { :name "closet"
    :desc "You are in a cramped closet."
    :exits {:south :start}
-   :items [:battle-axe :trunk]}
+   :items [:dagger :trunk]}
 
  { :name "hallway"
    :desc "You are in a long, low-lit hallway that turns to the east."

@@ -31,11 +31,11 @@
               (util/move-between-refs item
                                       (:items @player/*current-room*)
                                       player/*inventory*)
-              (rooms/tell-room @player/*current-room* (str player/*name* " picked up " name "."))
-              (str "You picked up " name "."))
+              (rooms/tell-room @player/*current-room* (str player/*name* " picked up a " name "."))
+              (str "You picked up the " name "."))
             (do
-              (rooms/tell-room @player/*current-room* (str player/*name* " tried to pick up " name ", and failed."))
-              (str "You can't pick up " name "."))))
+              (rooms/tell-room @player/*current-room* (str player/*name* " tried to pick up a " name ", and failed."))
+              (str "You can't pick up the " name "."))))
 
         ;; is this thing in a container?
         (if (re-find #"(?i)\s+from\s+" thing)

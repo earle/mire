@@ -16,7 +16,7 @@
             (util/move-between-refs item
                                player/*inventory*
                                (:items @player/*current-room*))
-            (rooms/tell-room @player/*current-room* (str player/*name* " dropped " name "."))
+            (rooms/tell-room @player/*current-room* (str player/*name* " dropped a " name "."))
             (str "You dropped the " name ".")))
         (if (= thing "all")
           (str/join "\n" (for [[k obj] (util/items-in-ref player/*player*)] (discard [(:name obj)])))

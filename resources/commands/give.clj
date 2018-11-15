@@ -26,12 +26,12 @@
                                         player/*inventory*
                                         (:items who))
                 (rooms/tell-room @player/*current-room*
-                                 (str player/*name* " gave " item-name
+                                 (str player/*name* " gave a " item-name
                                       " to " (:name who) ".") (:name who))
                 (player/tell-player (:name who)
-                                    (str player/*name* " gave you "
+                                    (str player/*name* " gave you a "
                                          item-name "."))
-                (str "You gave " item-name " to " (:name who) ".")))
+                (str "You gave a " item-name " to " (:name who) ".")))
             (str "You dont have a " thing " to give.")))
 
         (str (:name who) " isnt here."))

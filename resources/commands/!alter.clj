@@ -20,11 +20,16 @@
                    (first (util/get-local thing)))]
         ;; grab this item and update field to value
         (if-let [item (items/get-item k)]
-          (let [field (-> cmd first (str/replace ":" "") keyword)
-                value (read-string (str/join " " (next cmd)))]
-            ;; update the item instance
-            (dosync
-              (str k " " (pprint/write (k (alter items/items assoc-in [k field] value)) :stream nil))))
+          (if (< (count args) 3)
+            (str k " view " (pprint/write item :stream nil))
+
+            (let [field (-> cmd first (str/replace ":" "") keyword)
+                  value (read-string (str/join " " (next cmd)))]
+              ;; update the item instance
+              (dosync
+                (if (nil? value)
+                  (str k " del " (pprint/write (k (alter items/items assoc k (dissoc item field))) :stream nil))
+                  (str k " mod " (pprint/write (k (alter items/items assoc-in [k field] value)) :stream nil))))))
           (str "There item " k " doesn't exist."))
         (str "There isn't a " thing " to alter.")))
     (str "What do you want to alter?")))

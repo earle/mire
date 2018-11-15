@@ -21,9 +21,8 @@
   [things]
   (let [objs (frequencies things)]
     (if (> (count objs) 1)
-      (str (str/join ", "
-             (map count-and-pluralize (butlast objs))
-             ", and " (count-and-pluralize (last objs)) "."))
+      (str (str/join ", " (map count-and-pluralize (butlast objs)))
+          ", and " (count-and-pluralize (last objs)) ".")
       (str (count-and-pluralize (first objs)) "."))))
 
 (defn items-in-ref
@@ -66,7 +65,6 @@
     (if (room-contains? @player/*current-room* thing)
       [(find-item-in-ref @player/*current-room* thing) @player/*current-room*]
       nil)))
-
 
 (defn move-between-refs
   "Move instance of obj between from and to. Must call in a transaction."
