@@ -24,7 +24,7 @@
 
       ;; Is this thing in the room?
       (if (util/room-contains? @player/*current-room* thing)
-        (let [item (util/get-item-in-ref @player/*current-room* thing)
+        (let [item (util/find-item-in-ref @player/*current-room* thing)
               name (items/item-name item)]
           (if (items/moveable? item)
             (dosync
@@ -45,7 +45,7 @@
             ;; does this container exist in the room or inventory?
             (if-let [[from from-ref] (util/get-local (last things))]
               ;; does this item exist in this container?
-              (if-let [item (util/get-item-in-ref (items/get-item from) what)]
+              (if-let [item (util/find-item-in-ref (items/get-item from) what)]
                 (dosync
                   (util/move-between-refs item
                                           (:items (items/get-item from))

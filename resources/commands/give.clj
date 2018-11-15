@@ -19,7 +19,7 @@
       (if (contains? (rooms/others-in-room) (:name who))
         (let [thing (str/replace (str/join " " (butlast args)) #"(?i)\s+to$" "")]
           (if (util/carrying? thing)
-            (let [item (util/get-item-in-ref player/*player* thing)
+            (let [item (util/find-item-in-ref player/*player* thing)
                   item-name (items/item-name item)]
               (dosync
                 (util/move-between-refs item

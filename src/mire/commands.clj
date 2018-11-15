@@ -1,9 +1,7 @@
 (ns mire.commands
   (:require [clojure.string :as str]
-            [mire.rooms :as rooms]
-            [mire.player :as player]
-            [mire.util :as util]))
-
+            [mire.player :as player]))
+          
 ;; Commands (dynamically loaded from individual files)
 (def commands (ref {}))
 
@@ -21,6 +19,7 @@
                "i" "inventory"
                "l" "look"
                "alter" "!alter"})
+
 
 (defn load-command
   "Load command from files"

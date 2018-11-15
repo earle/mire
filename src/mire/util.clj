@@ -22,7 +22,8 @@
   (let [objs (frequencies things)]
     (if (> (count objs) 1)
       (str (str/join ", "
-             (map count-and-pluralize (butlast objs))) ", and " (count-and-pluralize (last objs)) ".")
+             (map count-and-pluralize (butlast objs))
+             ", and " (count-and-pluralize (last objs)) "."))
       (str (count-and-pluralize (first objs)) "."))))
 
 (defn items-in-ref
@@ -36,15 +37,15 @@
   ;;(println "find-items-in-ref: " (items-in-ref obj))
   (for [[k i] (items-in-ref obj) :when (or (= thing (:name i)) (in? (:aliases i) thing))] k))
 
+(defn find-item-in-ref
+  "Get the first item in obj by name"
+  [obj thing]
+  (keyword (first (find-items-in-ref obj thing))))
+
 (defn ref-contains?
   "Does an ref's :items contain an object by this name?"
   [obj thing]
   (> (count (find-items-in-ref obj thing)) 0))
-
-(defn get-item-in-ref
-  "Get the first item in obj by name"
-  [obj thing]
-  (keyword (first (find-items-in-ref obj thing))))
 
 (defn carrying?
    "Is this player carrying something?"
@@ -61,9 +62,9 @@
   "Get an item from player inventory or current room"
   [thing]
   (if (carrying? thing)
-    [(get-item-in-ref player/*player* thing) player/*player*]
+    [(find-item-in-ref player/*player* thing) player/*player*]
     (if (room-contains? @player/*current-room* thing)
-      [(get-item-in-ref @player/*current-room* thing) @player/*current-room*]
+      [(find-item-in-ref @player/*current-room* thing) @player/*current-room*]
       nil)))
 
 
