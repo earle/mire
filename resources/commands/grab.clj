@@ -21,7 +21,6 @@
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
-
       ;; Is this thing in the room?
       (if (util/room-contains? @player/*current-room* thing)
         (let [id (util/find-item-in-ref @player/*current-room* thing)

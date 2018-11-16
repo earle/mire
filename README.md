@@ -14,55 +14,50 @@ server. Then players can connect by telnetting to port 3333.
 
 ## Design
 
-Rooms and Items are defined in files in `resources`. Rooms are loaded into the
+Rooms and Items are defined in files in `resources/`. Rooms are loaded into the
 `@rooms/rooms` reference. Items are loaded into `@items/all-items`
 and individual instances of items are cloned into `@items/items`.
 
 ## Commands
 
-In game commands are defined in `resources/commands` with each command having
+In-game commands are defined in `resources/commands` with each command having
 it's own file and loaded in the `user` namespace. A command returns a string
-which is output to the users stream.
+which is output to the user.
 
 Command aliases are temporarily defined in `src/mire/commands.clj`
 
 Example command `grab`:
 
 ```Clojure
-(defn put
-  "Put something in something else."
+(defn discard
+  "Put something down that you're carrying"
   [args]
   (if (> (count args) 0)
-    (let [target (last args)
-          thing (str/replace (str/join " " (butlast args)) #"(?i)\s+(in|into)$" "")]
-      ;; does this container item exist in the room or inventory?
-      (if-let [to (first (util/get-local target))]
-        ;; make sure the item is a container
-        (if (items/container? to)
-          ;; does the item we're moving exist in the room or inventory?
-          (if-let [[from from-ref] (util/get-local thing)]
-            (dosync
-              (util/move-between-refs from
-                                      (:items from-ref)
-                                      (:items (items/get-item to)))
-
-              (rooms/tell-room @player/*current-room*
-                               (str player/*name* " put a " (items/item-name from)
-                                    " into a " (items/item-name to) "."))
-              (str "You put a " (items/item-name from) " into a " (items/item-name to) "."))
-            (str "There isn't any " thing " here."))
-          (str "You can't put things into a " (items/item-name to) "."))
-        (str "There isn't any " target " here.")))))
+    (let [thing (str/join " " args)]
+      (if (util/carrying? thing)
+        (let [id (util/find-item-in-ref player/*player* thing)
+              item (items/get-item id)
+              name (items/item-name item)]
+          (dosync
+            (util/move-between-refs id
+                                    player/*inventory*
+                                    (:items @player/*current-room*))
+            (rooms/tell-room @player/*current-room* (str player/*name* " dropped a " name "."))
+            (str "You dropped the " name ".")))
+        (if (= thing "all")
+          (str/join "\n" (for [[k obj] (util/items-in-ref player/*player*)] (discard [(:name obj)])))
+          (str "You're not carrying a " thing "."))))
+    (str "What do you want to drop?")))
 ```
 
 ## Players
 
 ## Items
 
-Items are defined inside of files in `resources/items`. Each file contains a
+Items are defined inside of files in `resources/items/`. Each file contains a
 list of objects. Each Object has a `name` key which will be used as a `keyword`
-in the combined database of items -- these must be unique. An item can have
-aliases, and will render in rooms by it's `sdesc` field.
+in the combined database of items -- these names should be unique. An item can have
+aliases, and will render by it's `sdesc` field, or `name` if it doesnt exist.
 
 If an item has `:container true` set then it can hold other items.
 
@@ -103,6 +98,55 @@ keyed by their `:name` property across all files. Example room file content:
    :desc "You wake up and find yourself in a round room with a pillar in the middle."
    :exits { :north :closet :south :hallway}
  }]
+```
+
+## Wiz
+
+To create an item, use `clone`.
+
+```Clojure
+> clone battle-axe
+You cloned a bronze battle axe {:ID :10, :aliases ["axe" "battle axe"], :name "battle-axe", :sdesc "bronze battle axe"}
+```
+
+To inspect in the current room, or your inventory: `inspect dagger` or `inspect Alice` or a specific item instance, `inspect :4`
+
+```Clojure
+> inspect axe
+Carrying:
+({:ID :10,
+  :aliases ["axe" "battle axe"],
+  :name "battle-axe",
+  :sdesc "bronze battle axe"})
+```
+
+To inspect everything in the room: `inspect`
+
+```clojure
+> inspect
+{:ID :closet,
+ :file :city.clj,
+ :desc "You are in a cramped closet.",
+ :exits #<Ref@799ac05e: {:south :start}>,
+ :inhabitants #<Ref@2800c4f9: #{"Alice"}>,
+ :items
+ ({:ID :7, :aliases ["red rose"], :name "rose", :sdesc "red rose"}
+  {:ID :2,
+   :container true,
+   :items
+   ({:ID :1, :name "dagger", :sdesc "small dagger"}
+    {:ID :5, :name "dagger", :sdesc "small dagger"}
+    {:ID :3, :name "dagger", :sdesc "small dagger"}),
+   :moveable false,
+   :name "trunk",
+   :sdesc "large trunk"})}
+```
+
+To modify the instance of an item:
+
+```Clojure
+> alter :3 :sdesc "a magic dagger"
+:3 {:name "dagger", :sdesc "a magic dagger", :ID :3}
 ```
 
 ## Motivation
