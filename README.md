@@ -72,7 +72,8 @@ If an item has `:container true` set then it can hold other items.
 ## Rooms
 
 Rooms are defined as objects inside of files in `resources/rooms`. Rooms are
-keyed by their `:name` property across all files. Example room file content:
+keyed by their `:name` property across all files and have `:exits` to navigate
+to other rooms. Example room file content:
 
 ```Clojure
 [{ :name "start"
@@ -109,7 +110,7 @@ To create an item, use `clone`.
 You cloned a bronze battle axe {:ID :10, :aliases ["axe" "battle axe"], :name "battle-axe", :sdesc "bronze battle axe"}
 ```
 
-To inspect in the current room, or your inventory: `inspect dagger` or `inspect Alice` or a specific item instance, `inspect :4`
+To inspect an item or player in the current room or your inventory: `inspect dagger` or `inspect Alice` &ndash; to inspect a specific item instance: `inspect :4`
 
 ```Clojure
 > inspect axe
@@ -120,7 +121,7 @@ Carrying:
   :sdesc "bronze battle axe"})
 ```
 
-To inspect everything in the room: `inspect`
+To inspect everything in the room: `inspect`:
 
 ```clojure
 > inspect
