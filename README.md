@@ -26,11 +26,11 @@ which is output to the user.
 
 Command aliases are temporarily defined in `src/mire/commands.clj`
 
-Example command `grab`:
+Example command `discard`:
 
 ```Clojure
 (defn discard
-  "Put something down that you're carrying"
+  "Discard an item that you're carrying"
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]

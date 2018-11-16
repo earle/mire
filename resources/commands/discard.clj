@@ -5,7 +5,7 @@
             [mire.player :as player]))
 
 (defn discard
-  "Put something down that you're carrying"
+  "Discard an item that you're carrying"
   [args]
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
