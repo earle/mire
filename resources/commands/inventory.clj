@@ -13,6 +13,7 @@
          ;;(map util/count-and-pluralize (frequencies (map items/item-name (seq @player/*inventory*)))))
          (->> @player/*inventory*
              seq
+             (map items/get-item)
              (map items/item-name)
              frequencies
              (map util/count-and-pluralize)))

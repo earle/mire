@@ -5,30 +5,46 @@
             [mire.util :as util]
             [mire.player :as player]))
 
+;; Need to handle:
+;; inspect -- inspects the current room and inventory
+;; inspect room -- inspects the current room and inventory
+;; inspect axe -- inspects every matching item in room and inventory
+;; inspect Bob -- inspects person and their inventory
+;; inspect :4 -- inspects a specific item instance
+;; inspect :battle-axe -- inspects keyword in all-items
+
 (defn inspect
-  "Inspect an item"
+  "Inspect an object"
   [args]
-  (if (> (count args) 0)
-    (let [thing (str/join " " args)
-          in-inventory (util/find-items-in-ref player/*player* thing)
-          in-room (util/find-items-in-ref @player/*current-room* thing)]
-        (if (> (count (concat in-inventory in-room)) 0)
+  (if (= (count args) 0)
+    ;; inspect the current room
+    (pprint/write (items/inspect-item @player/*current-room*) :stream nil)
+
+    ;; is this a keyword?
+    (if (str/starts-with? (first args) ":")
+      (let [k (keyword (str/replace (first args) ":" ""))]
+        ;; is this keyword an item instance?
+        (if-let [item (items/get-item k)]
+          (pprint/write (items/inspect-item item) :stream nil)
+          ;; is this keyword from the item database?
+          (if-let [item (k @items/all-items)]
+            (pprint/write (items/inspect-item item) :stream nil)
+            (str "Can't find a " k " to inspect."))))
+
+      ;; does this thing exist in the inventory or current room?
+      (let [name (first args)
+            carrying-ids (util/find-items-in-ref player/*player* name)
+            inroom-ids (util/find-items-in-ref @player/*current-room* name)]
+        (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0))
           (str
-            (str/join "\n" (map #(str "In Room: " % " "  (% @items/items)) in-room))
-            (if (> (count in-room) 0)
-              (str "\n") (str ""))
-            (str/join "\n" (map #(str "Carrying: " % " " (% @items/items)) in-inventory)))
-          ;; Did we specify an item keyword?
-          (if (= (first thing) \:)
-            (if-let [item (items/get-item (keyword (str/replace thing ":" "")))]
-              (str thing " " (pprint/write item :stream nil))
-              (str "Can't find " thing " to inspect.")))))
-    ;; inspecting a room instead
-    (let [items-in-room (str/join "\n    "
-                          (map #(str (first %) " " (last %))
-                               (util/items-in-ref @player/*current-room*)))]
-      (str "Room: " (pprint/write (dissoc @player/*current-room* :items) :stream nil)
-           "\n :items "
-           @(:items @player/*current-room*)
-           "\n    " items-in-room "\n"))))
-           
+            (if (> (count carrying-ids) 0)
+              (str "Carrying:\n" (pprint/write (->> carrying-ids (map items/get-item)) :stream nil) "\n"))
+            (if (> (count inroom-ids) 0)
+              (str "In Room:\n" (pprint/write (->> inroom-ids (map items/get-item)) :stream nil) "\n")))
+
+          ;; did we specify the current room explicitly?
+          (if (= name "room")
+            (pprint/write (items/inspect-item @player/*current-room*) :stream nil)
+            (if-let [p ((keyword (str/capitalize name)) @player/players)]
+              (pprint/write (items/inspect-item p) :stream nil)
+              (str "There isnt a " name " here."))))))))

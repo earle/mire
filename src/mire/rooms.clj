@@ -9,12 +9,12 @@
   "Create a room from a object"
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
-        room {(keyword (:name obj)) {:name (keyword (:name obj))
+        room {(keyword (:name obj)) {:ID (keyword (:name obj))
                                      :file (keyword (.getName file))
                                      :desc (:desc obj)
                                      :exits (ref (:exits obj))
-                                     :items items
-                                     :inhabitants (ref #{})}}]
+                                     :inhabitants (ref #{})
+                                     :items items}}]
     (conj rooms room)))
 
 (defn- load-room [rooms file]

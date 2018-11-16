@@ -19,11 +19,11 @@
 (defn comma-and-period
   "One, Two, and Three."
   [things]
-  (let [objs (frequencies things)]
-    (if (> (count objs) 1)
-      (str (str/join ", " (map count-and-pluralize (butlast objs)))
-          ", and " (count-and-pluralize (last objs)) ".")
-      (str (count-and-pluralize (first objs)) "."))))
+  (let [ids (frequencies things)]
+    (if (> (count ids) 1)
+      (str (str/join ", " (map count-and-pluralize (butlast ids)))
+          ", and " (count-and-pluralize (last ids)) ".")
+      (str (count-and-pluralize (first ids)) "."))))
 
 (defn items-in-ref
   "Items in this object"
@@ -32,19 +32,19 @@
 
 (defn find-items-in-ref
   "Find items by name or alias in an obj"
-  [obj thing]
+  [id thing]
   ;;(println "find-items-in-ref: " (items-in-ref obj))
-  (for [[k i] (items-in-ref obj) :when (or (= thing (:name i)) (in? (:aliases i) thing))] k))
+  (for [[k i] (items-in-ref id) :when (or (= thing (:name i)) (in? (:aliases i) thing))] k))
 
 (defn find-item-in-ref
   "Get the first item in obj by name"
-  [obj thing]
-  (keyword (first (find-items-in-ref obj thing))))
+  [id thing]
+  (keyword (first (find-items-in-ref id thing))))
 
 (defn ref-contains?
   "Does an ref's :items contain an object by this name?"
-  [obj thing]
-  (> (count (find-items-in-ref obj thing)) 0))
+  [id thing]
+  (> (count (find-items-in-ref id thing)) 0))
 
 (defn carrying?
    "Is this player carrying something?"

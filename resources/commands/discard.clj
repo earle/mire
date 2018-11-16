@@ -10,12 +10,13 @@
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
       (if (util/carrying? thing)
-        (let [item (util/find-item-in-ref player/*player* thing)
+        (let [id (util/find-item-in-ref player/*player* thing)
+              item (items/get-item id)
               name (items/item-name item)]
           (dosync
-            (util/move-between-refs item
-                               player/*inventory*
-                               (:items @player/*current-room*))
+            (util/move-between-refs id
+                                    player/*inventory*
+                                    (:items @player/*current-room*))
             (rooms/tell-room @player/*current-room* (str player/*name* " dropped a " name "."))
             (str "You dropped the " name ".")))
         (if (= thing "all")

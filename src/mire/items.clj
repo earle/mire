@@ -4,65 +4,69 @@
 (def items (ref {}))
 
 (defn get-item
-  "Get an item"
+  "Get an item.  We sort map keys"
   [item]
-  (item @items))
+  (if (contains? @items item)
+    (into (sorted-map) (item @items))
+    nil))
 
 (defn container?
   "Is this item a container of other items?"
-  [k]
-  (if-let [item (get-item k)]
-    (if (contains? item :container)
-      (:container item)
-      false)))
+  [item]
+  (if (contains? item :container)
+    (:container item)
+    false))
 
 (defn contents
   "Contents of this item"
-  [k]
-  (if-let [item (get-item k)]
-    (if-let [objs @(:items item)]
-      objs)))
+  [item]
+  (if-let [objs @(:items item)]
+    objs
+    []))
 
 (defn moveable?
   "Is this item moveable?"
-  [k]
-  (if-let [item (get-item k)]
-    (if (contains? item :moveable)
-      (:moveable item)
-      true)))
+  [item]
+  (if (contains? item :moveable)
+    (:moveable item)
+    true))
 
 (defn item-name
   "Get the short description  of an item if it exists"
   [item]
-  (if-let [item (item @items)]
-    (if (contains? item :sdesc)
-      (:sdesc item)
-      (:name item))
+  (if (contains? item :sdesc)
+    (:sdesc item)
     (:name item)))
 
 (defn item-desc
   "Get the description of an item, if it exists"
   [item]
-  (if-let [item (item @items)]
-    (if (contains? item :desc)
-      (:desc item)
-      (item-name item))
-    item))
+  (if (contains? item :desc)
+    (:desc item)
+    (item-name item)))
 
 (defn valid-item?
   "Is this a valid item?"
   [thing]
   (all-items (keyword thing)))
 
+(defn inspect-item
+  "Inspect an Object"
+  [item]
+  (if (:items item)
+    (do
+      (assoc item :items (map #(inspect-item (get-item %)) @(:items item))))
+    item))
+
 (defn clone-item
   "Clone an Item"
   [thing]
   (if (valid-item? thing)
     (let [item (all-items (keyword thing))
-           k (keyword (str (count @items)))]
+          id (keyword (str (count @items)))]
       (dosync
-        (alter items conj { k item})
-        (keyword k)))
+        (alter items conj { id (assoc item :ID id)})
+        id))
     (println "items/clone-item: Can't find " thing)))
 
 (defn- create-item

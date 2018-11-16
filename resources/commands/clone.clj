@@ -10,10 +10,10 @@
   (if (> (count args) 0)
     (let [thing (str/join " " args)]
       (if (items/valid-item? thing)
-        (let [item (items/clone-item thing)
-              name (:sdesc (items/get-item item))]
+        (let [id (items/clone-item thing)
+              item (items/get-item id)]
           (dosync
-            (alter player/*inventory* conj item)
-            (rooms/tell-room @player/*current-room* (str player/*name* " cloned a " name "."))
-            (str "You cloned a " name " (" item ")")))
+            (alter player/*inventory* conj id)
+            (rooms/tell-room @player/*current-room* (str player/*name* " cloned a " (items/item-name item) "."))
+            (str "You cloned a " (items/item-name item) " " item)))
         (str "Specify a valid item to clone.")))))
