@@ -3,6 +3,8 @@
             [mire.items :as items]))
 
 (def ^:dynamic *player*)
+(def ^:dynamic *input-stream*)
+(def ^:dynamic *output-stream*)
 (def ^:dynamic *current-room*)
 (def ^:dynamic *inventory*)
 (def ^:dynamic *name*)

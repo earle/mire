@@ -1,5 +1,7 @@
 (ns mire.server
-  (:require [clojure.java.io :as io]
+  (:require [nrepl.server :refer [start-server stop-server]]
+            [reply.eval-modes.nrepl :as eval-modes.nrepl]
+            [clojure.java.io :as io]
             [clojure.string :as str]
             [server.socket :as socket]
             [mire.player :as player]
@@ -7,6 +9,7 @@
             [mire.util :as util]
             [mire.commands :as commands]
             [mire.rooms :as rooms]))
+
 
 (def players (ref {}))
 
@@ -48,6 +51,8 @@
       ;; the one above so *in* and *out* will be bound to the socket
       (binding [player/*player* (@player/players (keyword name))
                 player/*name* name
+                player/*input-stream* in
+                player/*output-stream* out
                 player/*current-room* (:current-room (@player/players (keyword name)))
                 player/*inventory* (:items (@player/players (keyword name)))]
         (dosync
@@ -80,6 +85,10 @@
 (defn -main
   ([port dir]
    (init dir)
+
+   (defonce nrepl-server (start-server :port 7888))
+   (println "Launching nREPL server on port 7888")
+
    (defonce server (socket/create-server (Integer. port) mire-handle-client))
    (println "Launching Mire server on port" port))
 
