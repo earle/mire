@@ -5,9 +5,9 @@
 
 (defn get-item
   "Get an item.  We sort map keys"
-  [item]
-  (if (contains? @items item)
-    (into (sorted-map) (item @items))
+  [id]
+  (if (contains? @items id)
+    (into (sorted-map) (id @items))
     nil))
 
 (defn container?

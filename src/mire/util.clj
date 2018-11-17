@@ -63,8 +63,7 @@
   (if (carrying? thing)
     [(find-item-in-ref player/*player* thing) player/*player*]
     (if (room-contains? @player/*current-room* thing)
-      [(find-item-in-ref @player/*current-room* thing) @player/*current-room*]
-      nil)))
+      [(find-item-in-ref @player/*current-room* thing) @player/*current-room*])))
 
 (defn move-between-refs
   "Move instance of obj between from and to. Must call in a transaction."

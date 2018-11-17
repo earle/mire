@@ -21,7 +21,7 @@
         ;; grab this item and update field to value
         (if-let [item (items/get-item k)]
           (if (< (count args) 3)
-            (str k " view " (pprint/write item :stream nil))
+            (str k " " (pprint/write item :stream nil))
 
             (let [field (-> cmd first (str/replace ":" "") keyword)
                   value (read-string (str/join " " (next cmd)))]
