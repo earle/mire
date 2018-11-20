@@ -34,4 +34,4 @@
         (if (> (count items) 0)
           (str "You see " (util/comma-and-period (map #(items/item-name (items/get-item %)) items)) "\n"))
         (if (> (count others) 0)
-          (str "Also here: " (str/join "," others) ".\n"))))))
+          (str "Also here: " (str/join ", " others) ".\n"))))))

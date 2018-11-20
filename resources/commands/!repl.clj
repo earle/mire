@@ -12,12 +12,13 @@
 (defn !repl
   "Launch a REPL"
   [args]
-  (binding [*in* (io/input-stream player/*input-stream*)
-            *err* *out*]
-
+  (binding [*err* *out*]
+    ; not sure why this shows the prompt twice
     (let [options {:skip-default-init false,
                    :color true,
                    :standalone true,
-                   :help false}]
+                   :help false
+                   :output-stream (io/output-stream player/*output-stream*)
+                   :input-stream (io/input-stream player/*input-stream*)}]
 
       (reply/launch options))))

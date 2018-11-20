@@ -26,7 +26,9 @@
                    :sex "male"
                    :last-command (ref #{})
                    :current-room (ref #{})
-                   :items (ref #{})}})
+                   :items (ref #{})
+                   :followers (ref #{})
+                   :following (ref nil)}})
 
 (defn items-in-inventory
   "Items in this players inventory"

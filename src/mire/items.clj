@@ -1,7 +1,8 @@
 (ns mire.items)
 
-(def all-items (ref {}))
+; All items that exist, and the database of items to clone instances from
 (def items (ref {}))
+(def items-db (ref {}))
 
 (defn get-item
   "Get an item.  We sort map keys"
@@ -48,7 +49,7 @@
 (defn valid-item?
   "Is this a valid item?"
   [thing]
-  (all-items (keyword thing)))
+  (items-db (keyword thing)))
 
 (defn inspect-item
   "Inspect an Object"
@@ -62,7 +63,7 @@
   "Clone an Item"
   [thing]
   (if (valid-item? thing)
-    (let [item (all-items (keyword thing))
+    (let [item (items-db (keyword thing))
           id (keyword (str (count @items)))]
       (dosync
         (alter items conj { id (assoc item :ID id)})
@@ -99,4 +100,4 @@
   them to the mire.items/items map."
   [dir]
   (dosync
-   (alter all-items load-items dir)))
+   (alter items-db load-items dir)))

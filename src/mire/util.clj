@@ -17,7 +17,7 @@
       (str "a " name))))
 
 (defn comma-and-period
-  "One, Two, and Three."
+  "a one, 4 twos, and a three."
   [things]
   (let [ids (frequencies things)]
     (if (> (count ids) 1)

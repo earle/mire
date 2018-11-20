@@ -11,7 +11,7 @@
 ;; inspect axe -- inspects every matching item in room and inventory
 ;; inspect Bob -- inspects person and their inventory
 ;; inspect :4 -- inspects a specific item instance
-;; inspect :battle-axe -- inspects keyword in all-items
+;; inspect :battle-axe -- inspects keyword in items-db
 
 (defn inspect
   "Inspect an object"
@@ -27,7 +27,7 @@
         (if-let [item (items/get-item k)]
           (pprint/write (items/inspect-item item) :stream nil)
           ;; is this keyword from the item database?
-          (if-let [item (k @items/all-items)]
+          (if-let [item (k @items/items-db)]
             (pprint/write (items/inspect-item item) :stream nil)
             (str "Can't find a " k " to inspect."))))
 

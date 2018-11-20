@@ -77,7 +77,7 @@
 (defn- init
   [dir]
   (items/add-items (str dir "/items"))
-  (println "Added Items:" (keys @items/all-items))
+  (println "Added Items:" (keys @items/items-db))
   (rooms/add-rooms (str dir "/rooms"))
   (commands/add-commands (str dir "/commands")))
 
