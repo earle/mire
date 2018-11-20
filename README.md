@@ -15,7 +15,7 @@ server. Then players can connect by telnetting to port 3333.
 ## Design
 
 Rooms and Items are defined in files in `resources/`. Rooms are loaded into the
-`@rooms/rooms` reference. Items are loaded into `@items/all-items`
+`@rooms/rooms` reference. Items are loaded into `@items/items-db`
 and individual instances of items are cloned into `@items/items`.
 
 ## Commands
