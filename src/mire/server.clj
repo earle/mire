@@ -8,7 +8,8 @@
             [mire.items :as items]
             [mire.util :as util]
             [mire.commands :as commands]
-            [mire.rooms :as rooms]))
+            [mire.rooms :as rooms]
+            [mire.heartbeat :as heartbeat]))
 
 
 (def players (ref {}))
@@ -90,7 +91,9 @@
    (println "Launching nREPL server on port 7888")
 
    (defonce server (socket/create-server (Integer. port) mire-handle-client))
-   (println "Launching Mire server on port" port))
+   (println "Launching Mire server on port" port)
+
+   (future (heartbeat/heartbeat 4000)))
 
   ([port] (-main port "resources"))
 

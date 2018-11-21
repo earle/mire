@@ -19,11 +19,20 @@
   [name]
   ((keyword (str/capitalize name)) @players))
 
+(defmacro as-player
+  "Run functions in context of a specific player"
+  [p & body]
+  `(binding [player/*player* (@player/players (keyword ~p))
+             player/*name* ~p
+             player/*current-room* (:current-room player/*player*)
+             *out* (player/streams ~p)]
+     ~@body))
+
 (defn create-player
   "Create a player"
   [name]
   {(keyword name) {:name name
-                   :sex "male"
+                   :gender "female"
                    :last-command (ref #{})
                    :current-room (ref #{})
                    :items (ref #{})
