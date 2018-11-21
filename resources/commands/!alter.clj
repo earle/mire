@@ -15,7 +15,7 @@
     (let [thing (first args)
           cmd (rest args)]
       ;; Is this thing a keyword or the name of something in the room/inventory?
-      (if-let [k (if (= (first thing) \:)
+      (if-let [k (if (= (str/starts-with? thing \:))
                    (keyword (str/replace thing ":" ""))
                    (first (util/get-local thing)))]
         ;; grab this item and update field to value
