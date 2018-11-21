@@ -16,7 +16,6 @@
           (str "You are already following " target ", unfollow to stop.")
           (if (= target player/*name*)
             (str "You can't follow yourself!")
-
             (dosync
               ; if we're already following someone, stop, and remove from their followers list
               (if-let [who @(:following player/*player*)]

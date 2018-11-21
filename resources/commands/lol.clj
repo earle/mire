@@ -21,6 +21,6 @@
               (str "You laugh at yourself."))
             (do
               (rooms/tell-room @player/*current-room* (str player/*name* " laughs at " name ".") name)
-              (player/tell-player name (str player/*name* " laughs you."))
+              (player/tell-player name (str player/*name* " laughs at you."))
               (str "You laughed at " name ".")))
           (str name " isn't here."))))))
