@@ -15,7 +15,7 @@
     (let [thing (first args)
           cmd (rest args)]
       ;; Is this thing a keyword or the name of something in the room/inventory?
-      (if-let [k (if (= (str/starts-with? thing \:))
+      (if-let [k (if (= (str/starts-with? thing ":"))
                    (keyword (str/replace thing ":" ""))
                    (first (util/get-local thing)))]
         ;; grab this item and update field to value
@@ -27,6 +27,7 @@
                   value (read-string (str/join " " (next cmd)))]
               ;; update the item instance
               (dosync
+                (rooms/tell-room player/*current-room* (str player/*name* " edited the " (items/item-name item) "."))
                 (if (nil? value)
                   (str k " " (pprint/write (k (alter items/items assoc k (dissoc item field))) :stream nil))
                   (str k " " (pprint/write (k (alter items/items assoc-in [k field] value)) :stream nil))))))

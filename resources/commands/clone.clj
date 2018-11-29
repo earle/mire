@@ -8,7 +8,7 @@
   "Clone an item"
   [args]
   (if (> (count args) 0)
-    (let [thing (str/join " " args)]
+    (let [thing (str/replace-first (str/join " " args) ":" "")]
       (if (items/valid-item? thing)
         (let [id (items/clone-item thing)
               item (items/get-item id)]

@@ -32,7 +32,7 @@
             (str "Can't find a " k " to inspect."))))
 
       ;; does this thing exist in the inventory or current room?
-      (let [name (first args)
+      (let [name (str/join " " args)
             carrying-ids (util/find-items-in-ref player/*player* name)
             inroom-ids (util/find-items-in-ref @player/*current-room* name)]
         (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0))
@@ -45,6 +45,7 @@
           ;; did we specify the current room explicitly?
           (if (= name "room")
             (pprint/write (items/inspect-item @player/*current-room*) :stream nil)
+            ;; Is this a player?
             (if-let [p ((keyword (str/capitalize name)) @player/players)]
               (pprint/write (items/inspect-item p) :stream nil)
               (str "There isnt a " name " here."))))))))

@@ -7,14 +7,13 @@
 
 (defn -move-player
   [p from to direction]
-  ; move this player, and inform the previous room and new room
-  (util/move-between-refs p
-                      (:inhabitants @from)
-                      (:inhabitants to))
-  (rooms/tell-room from (str p " went " (name direction) ".") p)
-  (ref-set from to)
-  (rooms/tell-room to (str p " arrived.") p)
-  (player/tell-player p (commands/execute "look")))
+  (dosync
+    ; move this player, and inform the previous room and new room
+    (util/move-between-refs p (:inhabitants @from) (:inhabitants to))
+    (rooms/tell-room from (str p " went " (name direction) ".") p)
+    (ref-set from to)
+    (rooms/tell-room to (str p " arrived.") p)
+    (player/tell-player p (commands/execute "look"))))
 
 (defn move
   "\"♬ We gotta get out of this place... ♪\" Give a direction."
@@ -26,10 +25,9 @@
         following player/*name*]
 
     (if target
-      (dosync
+      (do
         ; move this player
         (-move-player player/*name* player/*current-room* target direction)
-
         ; move followers, inform previous room and new room.
         (doseq [p @(:followers player/*player*)]
           (if (contains? @(:inhabitants previous-room) p)

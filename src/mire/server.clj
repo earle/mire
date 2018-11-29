@@ -1,27 +1,30 @@
 (ns mire.server
   (:require [nrepl.server :refer [start-server stop-server]]
-            [reply.eval-modes.nrepl :as eval-modes.nrepl]
             [clojure.java.io :as io]
             [clojure.string :as str]
-            [server.socket :as socket]
+            [clojure.tools.logging :as log]
             [mire.player :as player]
             [mire.items :as items]
             [mire.util :as util]
             [mire.commands :as commands]
             [mire.rooms :as rooms]
-            [mire.heartbeat :as heartbeat]))
+            [mire.heartbeat :as heartbeat]
+            [reply.eval-modes.nrepl :as eval-modes.nrepl]
+            [server.socket :as socket]))
+
 
 
 (def players (ref {}))
 
 (defn- cleanup []
-  "Drop all inventory and remove player from room and player list."
+  "Player has disconnected."
   (dosync
-   (doseq [item @player/*inventory*]
-     (commands/execute (str "discard " item)))
-   (commute player/streams dissoc player/*name*)
-   (commute (:inhabitants @player/*current-room*)
-            disj player/*name*)))
+    ;; tell the room
+    (rooms/tell-room player/*current-room* (str player/*name* " disconnected."))
+
+    ;; Remove player stream, remove from room.
+    (commute player/streams dissoc player/*name*)
+    (commute (:inhabitants @player/*current-room*) disj player/*name*)))
 
 (defn- get-unique-player-name [s]
   (let [name (str/capitalize s)]

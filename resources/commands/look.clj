@@ -10,8 +10,10 @@
   [args]
   (if (> (count args) 0)
     (let [thing (str/replace (str/join " " args) #"(?i)^(in|into)\s+" "")]
+      ; Is this thing an item in the inventory or room?
       (if-let [[id item-ref] (util/get-local thing)]
         (let [item (items/get-item id)]
+          ; Is it a container?  What's inside?
           (if (items/container? item)
             (str (if (= item-ref player/*player*)
                    (str "You are carrying ")
@@ -21,11 +23,14 @@
                  (if (> (count (items/contents item)) 0)
                    (util/comma-and-period (map #(items/item-name (items/get-item %)) (items/contents item)))
                    (str "nothing.")))
+            ; If not a container, what is it?
             (str (if (= item-ref player/*player*)
                    (str "You are carrying ")
                    (str "You see "))
                  (items/item-desc item) ".")))
+        ; If its not an item, is it a Player?
         (str "There is no " thing " here.")))
+    ; Otherwise, what's in the room?
     (let [exits (map name (keys @(:exits @player/*current-room*)))
           others (rooms/others-in-room)
           items @(:items @player/*current-room*)]
