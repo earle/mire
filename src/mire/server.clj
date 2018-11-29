@@ -3,12 +3,13 @@
             [clojure.java.io :as io]
             [clojure.string :as str]
             [clojure.tools.logging :as log]
-            [mire.player :as player]
-            [mire.items :as items]
-            [mire.util :as util]
             [mire.commands :as commands]
-            [mire.rooms :as rooms]
             [mire.heartbeat :as heartbeat]
+            [mire.items :as items]
+            [mire.mobs :as mobs]
+            [mire.player :as player]
+            [mire.rooms :as rooms]
+            [mire.util :as util]
             [reply.eval-modes.nrepl :as eval-modes.nrepl]
             [server.socket :as socket]))
 
@@ -82,6 +83,8 @@
   [dir]
   (items/add-items (str dir "/items"))
   (println "Added Items:" (keys @items/items-db))
+  (mobs/add-mobs (str dir "/mobs"))
+  (println "Added Mobs:" (keys @mobs/mobs-db))
   (rooms/add-rooms (str dir "/rooms"))
   (commands/add-commands (str dir "/commands")))
 

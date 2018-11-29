@@ -25,7 +25,7 @@
               (dosync
                 ; if we're already following someone, stop, and remove from their followers list
                 (if-let [who @(:following player/*player*)]
-                  (dosync
+                  (do
                     (alter (:followers ((keyword who) @player/players)) disj player/*name*)
                     (player/tell-player who (str player/*name* " stopped following you."))))
                 ;; begin following someone, and inform them.

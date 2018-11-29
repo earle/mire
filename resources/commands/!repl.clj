@@ -1,10 +1,11 @@
 (ns user
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
+            [mire.commands :as commands]
             [mire.items :as items]
+            [mire.mobs :as mobs]
             [mire.player :as player]
             [mire.rooms :as rooms]
-            [mire.commands :as commands]
             [mire.util :as util]
             [nrepl.core :as nrepl]
             [reply.main :as reply]))

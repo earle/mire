@@ -30,7 +30,7 @@
 (def-command-test test-look
   (binding [player/*current-room* (ref (:closet @rooms/rooms))]
     (doseq [look-for [#"closet" #"keys" #"south"]]
-    (is (re-find look-for (look))))))
+     (is (re-find look-for (look))))))
 
 (def-command-test test-inventory
   (binding [player/*inventory* (ref [:keys :bunny])]

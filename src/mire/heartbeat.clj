@@ -9,7 +9,7 @@
 (defn heartbeat
   "The main heartbeat background process."
   [interval]
-  (println "heartbeat: starting, interval=" interval " seconds.")
+  (println "heartbeat: starting, interval:" interval " seconds.")
   (while true
     ; handle time sensitive tasks; combat, healing players, moving npcs, etc.
     (Thread/sleep interval)))
