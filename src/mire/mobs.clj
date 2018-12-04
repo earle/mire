@@ -1,5 +1,6 @@
 (ns mire.mobs
-  (:require [mire.items :as items]))
+  (:require [clojure.string :as str]
+            [mire.items :as items]))
 
 ; All mobs that exist, and the database of items to mob instances from
 (def mobs (ref {}))
@@ -32,15 +33,15 @@
   (mobs-db (keyword name)))
 
 (defn clone-mob
-  "Clone an Item"
-  [name]
-  (if (valid-mob? name)
-    (let [mob (mobs-db (keyword name))
-          id (keyword (str "mob-" (count @mobs)))]
+  "Clone a Mob"
+  [k]
+  (if-let [mob (mobs-db k)]
+    (let [name (str/replace-first k ":" "")
+          id (keyword (str name "-" (count (filter #(= (:name mob) (:name %)) (vals @mobs)))))]
       (dosync
         (alter mobs conj { id (assoc mob :ID id)})
         id))
-    (println "mobs/clone-mob: Can't find " name)))
+    (println "mobs/clone-mob: Can't find " k)))
 
 (defn- create-mob
   "Create a mob from a object"

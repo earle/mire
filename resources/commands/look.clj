@@ -33,10 +33,11 @@
     ; Otherwise, what's in the room?
     (let [exits (map name (keys @(:exits @player/*current-room*)))
           others (rooms/others-in-room)
-          items @(:items @player/*current-room*)]
+          mobs  (map #(mobs/mob-name (mobs/get-mob %)) @(:mobs @player/*current-room*))
+          items (map #(items/item-name (items/get-item %)) @(:items @player/*current-room*))]
       (str (:desc @player/*current-room*)
         "\nExits: " (str/join ", " exits) ".\n"
         (if (> (count items) 0)
-          (str "You see " (util/comma-and-period (map #(items/item-name (items/get-item %)) items)) "\n"))
+          (str "You see " (util/comma-and-period (concat mobs items)) "\n"))
         (if (> (count others) 0)
           (str "Also here: " (str/join ", " others) ".\n"))))))

@@ -4,6 +4,9 @@
             [mire.items :as items]
             [mire.player :as player]))
 
+; clone item :dagger
+; clone mob :guard
+
 (defn clone
   "Clone an item"
   [args]

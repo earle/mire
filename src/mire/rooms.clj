@@ -1,6 +1,7 @@
 (ns mire.rooms
   (:require [mire.player :as player]
-            [mire.items :as items]))
+            [mire.items :as items]
+            [mire.mobs :as mobs]))
 
 ;; state for all rooms
 (def rooms (ref {}))
@@ -9,11 +10,13 @@
   "Create a room from a object"
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
+        mobs (ref (or (into #{} (remove nil? (map mobs/clone-mob (:mobs obj)))) #{}))
         room {(keyword (:name obj)) {:ID (keyword (:name obj))
                                      :file (keyword (.getName file))
                                      :desc (:desc obj)
                                      :exits (ref (:exits obj))
                                      :inhabitants (ref #{})
+                                     :mobs mobs
                                      :items items}}]
     (conj rooms room)))
 

@@ -1,4 +1,5 @@
-(ns mire.items)
+(ns mire.items
+  (:require [clojure.string :as str]))
 
 ; All items that exist, and the database of items to clone instances from
 (def items (ref {}))
@@ -61,14 +62,14 @@
 
 (defn clone-item
   "Clone an Item"
-  [thing]
-  (if (valid-item? thing)
-    (let [item (items-db (keyword thing))
-          id (keyword (str (count @items)))]
+  [k]
+  (if-let [item (items-db k)]
+    (let [name (str/replace-first k ":" "")
+          id (keyword (str name "-" (count (filter #(= (:name item) (:name %)) (vals @items)))))]
       (dosync
         (alter items conj { id (assoc item :ID id)})
         id))
-    (println "items/clone-item: Can't find " thing)))
+    (println "items/clone-item: Can't find " k)))
 
 (defn- create-item
   "Create an item from a object"
