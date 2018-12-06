@@ -5,6 +5,19 @@
             [mire.util :as util]
             [mire.player :as player]))
 
+(defn -look-at-inventory
+  "See what a ref is carrying"
+  [obj]
+  (if (> (count @(:items obj)) 0)
+    (str/join "\n"
+      (->> @(:items obj)
+          seq
+          (map items/get-item)
+          (map items/item-name)
+          frequencies
+          (map util/count-and-pluralize)))
+    (str "nothing.")))
+
 (defn look
   "Get a description of the surrounding environs and its contents."
   [args]
@@ -28,8 +41,10 @@
                    (str "You are carrying ")
                    (str "You see "))
                  (items/item-desc item) ".")))
-        ; If its not an item, is it a Player?
-        (str "There is no " thing " here.")))
+        ; If its not an item, is it a Mob?
+        (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* thing))]
+          (str "The " (mobs/mob-name mob) " is carrying:\n" (-look-at-inventory mob))
+          (str "There is no " thing " here."))))
     ; Otherwise, what's in the room?
     (let [exits (map name (keys @(:exits @player/*current-room*)))
           others (rooms/others-in-room)

@@ -52,14 +52,6 @@
   [thing]
   (items-db (keyword thing)))
 
-(defn inspect-item
-  "Inspect an Object"
-  [item]
-  (if (:items item)
-    (do
-      (assoc item :items (map #(inspect-item (get-item %)) @(:items item))))
-    item))
-
 (defn clone-item
   "Clone an Item"
   [k]

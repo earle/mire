@@ -1,7 +1,9 @@
 (ns mire.util
   (:require [clojure.string :as str]
-            [mire.player :as player]
-            [mire.items :as items]))
+            [mire.items :as items]
+            [mire.mobs :as mobs]
+            [mire.player :as player]))
+
 
 (defn in?
   "true if coll contains elm"
@@ -41,6 +43,22 @@
   [id thing]
   (keyword (first (find-items-in-ref id thing))))
 
+(defn mobs-in-room
+  "Mobs in this room"
+  [room]
+  (select-keys @mobs/mobs @(:mobs room)))
+
+(defn find-mobs-in-room
+  "Find mobs by name or alias in a room"
+  [room name]
+  ;;(println "find-mobs-in-room: " (items-in-ref obj))
+  (for [[k i] (mobs-in-room room) :when (or (= name (:name i)) (in? (:aliases i) name))] k))
+
+(defn find-mob-in-room
+  "Find the first mob in a room bny name"
+  [room name]
+  (keyword (first (find-mobs-in-room room name))))
+
 (defn ref-contains?
   "Does an ref's :items contain an object by this name?"
   [id thing]
@@ -64,6 +82,14 @@
     [(find-item-in-ref player/*player* thing) player/*player*]
     (if (room-contains? @player/*current-room* thing)
       [(find-item-in-ref @player/*current-room* thing) @player/*current-room*])))
+
+(defn inspect-object
+  "Inspect an Object"
+  [obj]
+  (if (:items obj)
+    (do
+      (assoc obj :items (map #(inspect-object (items/get-item %)) @(:items obj))))
+    obj))
 
 (defn move-between-refs
   "Move instance of obj between from and to. Must call in a transaction."

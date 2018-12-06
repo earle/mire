@@ -33,5 +33,5 @@
                                     (mobs/mob-name (mobs/get-mob id)) "."))
               (str "You cloned a " (mobs/mob-name (mobs/get-mob id)) ", " id))
             (str "Specify a valid mob to clone."))
-          (str "Usage: 'clone item|mob :keyword'"))))
-    (str "Usage: 'clone item|mob :keyword'")))
+          (str "Usage: 'clone <item|mob> :keyword'"))))
+    (str "Usage: 'clone <item|mob> :keyword'")))

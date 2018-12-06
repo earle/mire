@@ -18,18 +18,21 @@
   [args]
   (if (= (count args) 0)
     ;; inspect the current room
-    (pprint/write (items/inspect-item @player/*current-room*) :stream nil)
+    (pprint/write (util/inspect-object @player/*current-room*) :stream nil)
 
     ;; is this a keyword?
     (if (str/starts-with? (first args) ":")
       (let [k (keyword (str/replace (first args) ":" ""))]
         ;; is this keyword an item instance?
         (if-let [item (items/get-item k)]
-          (pprint/write (items/inspect-item item) :stream nil)
+          (pprint/write (util/inspect-object item) :stream nil)
           ;; is this keyword from the item database?
           (if-let [item (k @items/items-db)]
-            (pprint/write (items/inspect-item item) :stream nil)
-            (str "Can't find a " k " to inspect."))))
+            (pprint/write (util/inspect-object item) :stream nil)
+            ;; is this keyword a mob instance?
+            (if-let [mob (mobs/get-mob k)]
+              (pprint/write (util/inspect-object mob) :stream nil)
+              (str "Can't find a " k " to inspect.")))))
 
       ;; does this thing exist in the inventory or current room?
       (let [name (str/join " " args)
@@ -44,8 +47,8 @@
 
           ;; did we specify the current room explicitly?
           (if (= name "room")
-            (pprint/write (items/inspect-item @player/*current-room*) :stream nil)
+            (pprint/write (util/inspect-object @player/*current-room*) :stream nil)
             ;; Is this a player?
             (if-let [p ((keyword (str/capitalize name)) @player/players)]
-              (pprint/write (items/inspect-item p) :stream nil)
+              (pprint/write (util/inspect-object p) :stream nil)
               (str "There isnt a " name " here."))))))))
