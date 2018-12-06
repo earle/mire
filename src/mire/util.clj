@@ -2,7 +2,8 @@
   (:require [clojure.string :as str]
             [mire.items :as items]
             [mire.mobs :as mobs]
-            [mire.player :as player]))
+            [mire.player :as player]
+            [zprint.core :as zp]))
 
 
 (defn in?
@@ -83,13 +84,22 @@
     (if (room-contains? @player/*current-room* thing)
       [(find-item-in-ref @player/*current-room* thing) @player/*current-room*])))
 
+(defn flatten-items
+  [obj]
+  (if (:items obj)
+    (assoc obj :items (map #(items/get-item %) @(:items obj)))
+    obj))
+
+(defn flatten-mobs
+  [obj]
+  (if (:mobs obj)
+    (assoc obj :mobs (map #(flatten-items (mobs/get-mob %)) @(:mobs obj)))
+    obj))
+
 (defn inspect-object
   "Inspect an Object"
   [obj]
-  (if (:items obj)
-    (do
-      (assoc obj :items (map #(inspect-object (items/get-item %)) @(:items obj))))
-    obj))
+  (zp/zprint-str (flatten-items (flatten-mobs obj)) {:map {:key-order [:id :name]}}))
 
 (defn move-between-refs
   "Move instance of obj between from and to. Must call in a transaction."

@@ -40,14 +40,14 @@
           items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
           id (keyword (str name "-" (count (filter #(= (:name mob) (:name %)) (vals @mobs)))))]
       (dosync
-        (alter mobs conj { id (assoc mob :ID id :items items)})
+        (alter mobs conj { id (assoc mob :id id :items items)})
         id))
     (println "mobs/clone-mob: Can't find " k)))
 
 (defn- create-mob
   "Create a mob database entry from a object"
   [mobs file obj]
-  (let [mob {(keyword (:name obj)) (assoc obj :file (keyword (.getName file)))}]
+  (let [mob {(keyword (:name obj)) (assoc obj :file (.getName file))}]
     (conj mobs mob)))
 
 (defn- load-mob

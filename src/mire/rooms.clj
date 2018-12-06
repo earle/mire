@@ -11,7 +11,7 @@
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
         mobs (ref (or (into #{} (remove nil? (map mobs/clone-mob (:mobs obj)))) #{}))
-        room {(keyword (:name obj)) {:ID (keyword (:name obj))
+        room {(keyword (:name obj)) {:id (keyword (:name obj))
                                      :file (keyword (.getName file))
                                      :desc (:desc obj)
                                      :exits (ref (:exits obj))

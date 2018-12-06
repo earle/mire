@@ -18,20 +18,20 @@
   [args]
   (if (= (count args) 0)
     ;; inspect the current room
-    (pprint/write (util/inspect-object @player/*current-room*) :stream nil)
+    (util/inspect-object @player/*current-room*)
 
     ;; is this a keyword?
     (if (str/starts-with? (first args) ":")
       (let [k (keyword (str/replace (first args) ":" ""))]
         ;; is this keyword an item instance?
         (if-let [item (items/get-item k)]
-          (pprint/write (util/inspect-object item) :stream nil)
+          (util/inspect-object item)
           ;; is this keyword from the item database?
           (if-let [item (k @items/items-db)]
-            (pprint/write (util/inspect-object item) :stream nil)
+            (util/inspect-object item)
             ;; is this keyword a mob instance?
             (if-let [mob (mobs/get-mob k)]
-              (pprint/write (util/inspect-object mob) :stream nil)
+              (util/inspect-object mob)
               (str "Can't find a " k " to inspect.")))))
 
       ;; does this thing exist in the inventory or current room?
@@ -41,14 +41,14 @@
         (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0))
           (str
             (if (> (count carrying-ids) 0)
-              (str "Carrying:\n" (pprint/write (->> carrying-ids (map items/get-item)) :stream nil) "\n"))
+              (str "Carrying:\n" (util/inspect-object (->> carrying-ids (map items/get-item))) "\n"))
             (if (> (count inroom-ids) 0)
-              (str "In Room:\n" (pprint/write (->> inroom-ids (map items/get-item)) :stream nil) "\n")))
+              (str "In Room:\n" (util/inspect-object (->> inroom-ids (map items/get-item))) "\n")))
 
           ;; did we specify the current room explicitly?
           (if (= name "room")
-            (pprint/write (util/inspect-object @player/*current-room*) :stream nil)
+            (util/inspect-object @player/*current-room*)
             ;; Is this a player?
             (if-let [p ((keyword (str/capitalize name)) @player/players)]
-              (pprint/write (util/inspect-object p) :stream nil)
+              (util/inspect-object p)
               (str "There isnt a " name " here."))))))))
