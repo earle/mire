@@ -11,12 +11,6 @@
 ;;   give axe alice
 ;;   give battle axe alice
 
-(defn -give-to
-  "Give item to Player or Mob"
-  [item who]
-  (dosync
-    (util/move-between-refs item player/*inventory* (:items who))))
-
 (defn give
   "Give something to someone"
   [args]
@@ -32,8 +26,8 @@
         (if-let [who (player/get-player (last args))]
           ;; Is this player in the current room?
           (if (contains? (rooms/others-in-room) (:name who))
-            (do
-              (-give-to id who)
+            (dosync
+              (util/move-between-refs id player/*inventory* (:items who))
               (rooms/tell-room @player/*current-room*
                                (str player/*name* " gave a " name
                                     " to " (:name who) ".") (:name who))
@@ -41,11 +35,11 @@
                                   (str player/*name* " gave you a " name "."))
               (str "You gave a " name " to " (:name who) "."))
             (str (:name who) " isn't here."))
-          
+
           ;; It's not a Player, is it a mob?
           (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* (last args)))]
-            (do
-              (-give-to id mob)
+            (dosync
+              (util/move-between-refs id player/*inventory* (:items mob))
               (rooms/tell-room @player/*current-room*
                                (str player/*name* " gave a " name " to the " (:name mob) "."))
               (str "You gave a " name " to the " (:name mob) "."))
