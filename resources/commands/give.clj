@@ -11,30 +11,44 @@
 ;;   give axe alice
 ;;   give battle axe alice
 
+(defn -give-to
+  "Give item to Player or Mob"
+  [item who]
+  (dosync
+    (util/move-between-refs item player/*inventory* (:items who))))
+
 (defn give
   "Give something to someone"
   [args]
   (if (> (count args) 0)
-    (if-let [who (player/get-player (last args))]
-      (if (contains? (rooms/others-in-room) (:name who))
-        (let [thing (str/replace (str/join " " (butlast args)) #"(?i)\s+to$" "")]
-          (if (util/carrying? thing)
-            (let [id (util/find-item-in-ref player/*player* thing)
-                  item (items/get-item id)
-                  name (items/item-name item)]
-              (dosync
-                (util/move-between-refs item
-                                        player/*inventory*
-                                        (:items who))
-                (rooms/tell-room @player/*current-room*
-                                 (str player/*name* " gave a " name
-                                      " to " (:name who) ".") (:name who))
-                (player/tell-player (:name who)
-                                    (str player/*name* " gave you a "
-                                         name "."))
-                (str "You gave a " name " to " (:name who) ".")))
-            (str "You dont have a " thing " to give.")))
+    (let [thing (str/replace (str/join " " (butlast args)) #"(?i)\s+to$" "")
+          id (util/find-item-in-ref player/*player* thing)
+          item (items/get-item id)
+          name (items/item-name item)]
 
-        (str (:name who) " isnt here."))
-      (str "No such player " (last args) "."))
+      ;; Are we carrying this thing?
+      (if (util/carrying? thing)
+        ;; Is this a player?
+        (if-let [who (player/get-player (last args))]
+          ;; Is this player in the current room?
+          (if (contains? (rooms/others-in-room) (:name who))
+            (do
+              (-give-to id who)
+              (rooms/tell-room @player/*current-room*
+                               (str player/*name* " gave a " name
+                                    " to " (:name who) ".") (:name who))
+              (player/tell-player (:name who)
+                                  (str player/*name* " gave you a " name "."))
+              (str "You gave a " name " to " (:name who) "."))
+            (str (:name who) " isn't here."))
+          
+          ;; It's not a Player, is it a mob?
+          (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* (last args)))]
+            (do
+              (-give-to id mob)
+              (rooms/tell-room @player/*current-room*
+                               (str player/*name* " gave a " name " to the " (:name mob) "."))
+              (str "You gave a " name " to the " (:name mob) "."))
+            (str "There isn't a " (last args) " here.")))
+        (str "You dont have a " thing " to give.")))
     (str "What do you want to give, to whom?")))

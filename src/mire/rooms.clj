@@ -47,6 +47,11 @@
   []
   (disj @(:inhabitants @player/*current-room*) player/*name*))
 
+(defn mobs-in-room
+  "Mobs in the current room"
+  []
+  @(:mobs @player/*current-room*))
+
 (defn tell-room
   "Send a message to all inhabitants in a room; optionally exclude"
   [room message & exclude]

@@ -44,7 +44,11 @@
         ; If its not an item, is it a Mob?
         (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* thing))]
           (str "The " (mobs/mob-name mob) " is carrying:\n" (-look-at-inventory mob))
-          (str "There is no " thing " here."))))
+          
+          ;; If it's not an Item or a Mob, is it a Player?
+          (if-let [p (player/get-player thing)]
+            (str (:name p) " is carrying:\n" (-look-at-inventory p))
+            (str "There is no " thing " here.")))))
     ; Otherwise, what's in the room?
     (let [exits (map name (keys @(:exits @player/*current-room*)))
           others (rooms/others-in-room)
