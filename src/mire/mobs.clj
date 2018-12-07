@@ -41,8 +41,7 @@
           id (keyword (str name "-" (count (filter #(= (:name mob) (:name %)) (vals @mobs)))))]
       (dosync
         (alter mobs conj { id (assoc mob :id id :items items)})
-        id))
-    (println "mobs/clone-mob: Can't find " k)))
+        id))))
 
 (defn- create-mob
   "Create a mob database entry from a object"

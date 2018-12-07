@@ -60,8 +60,7 @@
           id (keyword (str name "-" (count (filter #(= (:name item) (:name %)) (vals @items)))))]
       (dosync
         (alter items conj { id (assoc item :id id)})
-        id))
-    (println "items/clone-item: Can't find " k)))
+        id))))
 
 (defn- create-item
   "Create an item from a object"

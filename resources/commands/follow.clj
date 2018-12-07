@@ -34,7 +34,7 @@
                 (player/tell-player target (str player/*name* " started following you."))
                 (str "You start following " target "."))))
           (str target " isn't here to follow."))
-        (str "There isn't a " target " here to follow.")))
+        (str "Who do you want to follow?")))
     (if (:following player/*player*)
       (str "You're currently following " @(:following player/*player*) ".")
       (str "Who do you want to follow?"))))

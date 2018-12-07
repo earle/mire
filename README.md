@@ -14,9 +14,71 @@ server. Then players can connect by telnetting to port 3333.
 
 ## Design
 
-Rooms and Items are defined in files in `resources/`. Rooms are loaded into the
-`@rooms/rooms` reference. Items are loaded into `@items/items-db`
-and individual instances of items are cloned into `@items/items`.
+There are four main types of in-game objects: _Rooms_, _Items_, _Mobs_, and _Players_.
+
+### Rooms
+
+Rooms are defined in files in `resources/`. Rooms are loaded into the
+`@rooms/rooms` reference. Each file can contain multiple room objects so rooms can
+be organized by specific areas. Rooms link to other rooms via keywords in the `exits`
+map reference inside the room object. Rooms can contain items, and mobs both which
+are cloned upon game startup and placed within the room.
+
+```clojure
+{ :name "start"
+   :desc "You are in a round room with a pillar in the middle."
+   :exits {:north :closet :south :hallway}
+   :items [:fountain :dagger]
+   :mobs [:guard :guard :guard :rat :rat]}
+
+ { :name "closet"
+   :desc "You are in a cramped closet."
+   :exits {:south :start}
+   :items [:dagger :trunk]}
+
+ { :name "hallway"
+   :desc "You are in a long, low-lit hallway that turns to the east."
+   :exits {:north :start :east :promenade}}
+
+ { :name "promenade"
+   :desc "The promenade stretches out before you."
+   :exits {:west :hallway :east :forest}}]
+```
+
+The `:inhabitants` keyword contains any players that are currently in the room.
+
+## Items
+
+Items are defined in files in `resources/`. Items are loaded into the
+`@items/items-db` reference. Each file can contain multiple item objects so they can
+be organized by specific types. Each item should have at a minimum a `:name`.
+
+```Clojure
+[{ :name "dagger" :sdesc "small dagger"}
+ { :name "battle-axe" :aliases [ "axe" "battle axe" ] :sdesc "bronze battle axe"}
+ { :name "trunk" :sdesc "large trunk" :moveable false :container true}]
+```
+
+Individual instances of items are cloned into `@items/items`. Each item is cloned given
+a keyword based on the items name, and the current number of items in the game.
+
+```Clojure
+user=> (:dagger-0 @items/items)
+{:name "dagger", :sdesc "small dagger", :id :dagger-0}
+```
+
+Item's can be containers to hold other items by setting the `:container` flag to true.
+
+```Clojure
+> look
+You are in a cramped closet.
+Exits: south.
+You see a large trunk, and a small dagger.
+
+> look in trunk
+You see large trunk, which contains:
+2 red roses.
+```
 
 ## Commands
 
@@ -50,72 +112,24 @@ Example command `discard`:
     (str "What do you want to drop?")))
 ```
 
-## Players
-
-## Items
-
-Items are defined inside of files in `resources/items/`. Each file contains a
-list of objects. Each Object has a `name` key which will be used as a `keyword`
-in the combined database of items -- these names should be unique. An item can have
-aliases, and will render by it's `sdesc` field, or `name` if it doesnt exist.
-
-If an item has `:container true` set then it can hold other items.
-
-```Clojure
-[
- { :name "dagger" :sdesc "a dagger"}
- { :name "battle-axe" :aliases [ "axe", "battle axe" ] :sdesc "a bronze battle axe"}
- { :name "fountain" :sdesc "a fountain" :moveable false}
-]
-```
-
-## Rooms
-
-Rooms are defined as objects inside of files in `resources/rooms`. Rooms are
-keyed by their `:name` property across all files and have `:exits` to navigate
-to other rooms. Example room file content:
-
-```Clojure
-[{ :name "start"
-   :desc "You are in a round room with a pillar in the middle."
-   :exits { :north :closet :south :hallway}}
-
- { :name "closet"
-   :desc "You are in a cramped closet."
-   :exits {:south :start}
-   :items #{:key}}
-
- { :name "hallway"
-   :desc "You are in a long, low-lit hallway that turns to the east."
-   :items #{:detector}
-   :exits {:north :start :east :promenade}}
-
- { :name "promenade"
-   :desc "The promenade stretches out before you."
-   :exits {:west :hallway :east :forest}
-   :items #{:bunny :turtle}}
-
- { :name "start"
-   :desc "You wake up and find yourself in a round room with a pillar in the middle."
-   :exits { :north :closet :south :hallway}
- }]
-```
-
 ## Wiz
 
 To create an item, use `clone`.
 
 ```Clojure
-> clone battle-axe
-You cloned a bronze battle axe {:ID :10, :aliases ["axe" "battle axe"], :name "battle-axe", :sdesc "bronze battle axe"}
+> clone :dagger
+You cloned {:id :dagger-2, :name "dagger", :sdesc "small dagger"}.
 ```
 
-To inspect an item or player in the current room or your inventory: `inspect dagger` or `inspect Alice` &ndash; to inspect a specific item instance: `inspect :4`
+To inspect an item or player in the current room or your inventory: `inspect dagger`
+or `inspect guard` &ndash; to inspect a specific item instance: `inspect :dagger-0`.  
+To inspect everything in the room it's simply `inspect` &ndash; for everything
+you are carrying it's `inspect inventory`.
 
 ```Clojure
 > inspect axe
 Carrying:
-({:ID :10,
+({:id :battle-axe-0,
   :aliases ["axe" "battle axe"],
   :name "battle-axe",
   :sdesc "bronze battle axe"})
@@ -125,29 +139,32 @@ To inspect everything in the room: `inspect`:
 
 ```clojure
 > inspect
-{:ID :closet,
+{:id :hallway,
+ :desc "You are in a long, low-lit hallway that turns to the east.",
+ :exits
+   #object[clojure.lang.Ref 0x3b20c8f2 {:status :ready, :val {:north :start, :east :promenade}}],
  :file :city.clj,
- :desc "You are in a cramped closet.",
- :exits #<Ref@799ac05e: {:south :start}>,
- :inhabitants #<Ref@2800c4f9: #{"Alice"}>,
- :items
- ({:ID :7, :aliases ["red rose"], :name "rose", :sdesc "red rose"}
-  {:ID :2,
-   :container true,
-   :items
-   ({:ID :1, :name "dagger", :sdesc "small dagger"}
-    {:ID :5, :name "dagger", :sdesc "small dagger"}
-    {:ID :3, :name "dagger", :sdesc "small dagger"}),
-   :moveable false,
-   :name "trunk",
-   :sdesc "large trunk"})}
+ :inhabitants
+   #object[clojure.lang.Ref 0x3115ee96 {:status :ready, :val #{"Alice"}}],
+ :items ({:id :rose-3, :name "rose", :aliases ["red rose"], :sdesc "red rose"}),
+ :mobs
+   ({:id :guard-3,
+     :name "guard",
+     :file "basic.clj",
+     :items ({:id :battle-axe-6,
+              :name "battle-axe",
+              :aliases ["axe" "battle axe"],
+              :sdesc "bronze battle axe"}),
+     :sdesc "city guard"})}
 ```
 
 To modify the instance of an item:
 
 ```Clojure
-> alter :3 :sdesc "a magic dagger"
-:3 {:name "dagger", :sdesc "a magic dagger", :ID :3}
+> clone :dagger
+You cloned {:id :dagger-2, :name "dagger", :sdesc "small dagger"}.
+> alter :dagger-2 :sdesc "a magic dagger"
+:dagger-2 {:name "dagger", :sdesc "a magic dagger", :id :dagger-2}
 ```
 
 ## Motivation

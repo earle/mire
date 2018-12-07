@@ -37,17 +37,20 @@
       ;; does this thing exist in the inventory or current room?
       (let [name (str/join " " args)
             carrying-ids (util/find-items-in-ref player/*player* name)
-            inroom-ids (util/find-items-in-ref @player/*current-room* name)]
-        (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0))
+            inroom-ids (util/find-items-in-ref @player/*current-room* name)
+            mob-ids (util/find-mobs-in-room @player/*current-room* name)]
+        (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0) (> (count mob-ids) 0))
           (str
+            (if (> (count mob-ids) 0)
+              (str "Mobs:\n" (util/inspect-object (->> mob-ids (map mobs/get-mob))) "\n"))
             (if (> (count carrying-ids) 0)
               (str "Carrying:\n" (util/inspect-object (->> carrying-ids (map items/get-item))) "\n"))
             (if (> (count inroom-ids) 0)
               (str "In Room:\n" (util/inspect-object (->> inroom-ids (map items/get-item))) "\n")))
 
           ;; did we specify the current room explicitly?
-          (if (= name "room")
-            (util/inspect-object @player/*current-room*)
+          (if (= name "inventory")
+            (str "Carrying:\n" (util/inspect-object (->> @player/*inventory* (map items/get-item))) "\n")
             ;; Is this a player?
             (if-let [p ((keyword (str/capitalize name)) @player/players)]
               (util/inspect-object p)
