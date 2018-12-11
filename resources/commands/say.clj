@@ -7,5 +7,5 @@
   "Say something out loud so everyone in the room can hear."
   [args]
   (let [message (str/join " " args)]
-    (rooms/tell-room @player/*current-room* (str player/*name* " says: " message))
+    (rooms/tell-others-in-room (str player/*name* " says: " message))
     (str "You said: " message)))

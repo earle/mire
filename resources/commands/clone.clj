@@ -16,17 +16,15 @@
       (if-let [id (items/clone-item k)]
         (dosync
           (alter player/*inventory* conj id)
-          (rooms/tell-room @player/*current-room*
-                           (str player/*name* " cloned a "
-                                (items/item-name (items/get-item id)) "."))
+          (rooms/tell-others-in-room (str player/*name* " cloned a "
+                                       (items/item-name (items/get-item id)) "."))
           (str "You cloned " (util/inspect-object (items/get-item id)) "."))
         (if-let [id (mobs/clone-mob k)]
           (dosync
 
             (alter (player/*current-room* :mobs) conj id)
-            (rooms/tell-room @player/*current-room*
-                             (str player/*name* " cloned a "
-                                  (mobs/mob-name (mobs/get-mob id)) "."))
+            (rooms/tell-others-in-room (str player/*name* " cloned a "
+                                         (mobs/mob-name (mobs/get-mob id)) "."))
             (str "You cloned a " (util/inspect-object (mobs/get-mob id))
                  "."))
           (str "Specify a valid mob to clone."))))

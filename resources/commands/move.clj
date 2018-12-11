@@ -5,16 +5,6 @@
             [mire.commands :as commands]
             [mire.player :as player]))
 
-(defn -move-player
-  [p from to direction]
-  (dosync
-    ; move this player, and inform the previous room and new room
-    (util/move-between-refs p (:inhabitants @from) (:inhabitants to))
-    (rooms/tell-room from (str p " went " (name direction) ".") p)
-    (ref-set from to)
-    (rooms/tell-room to (str p " arrived.") p)
-    (player/tell-player p (commands/execute "look"))))
-
 (defn move
   "\"♬ We gotta get out of this place... ♪\" Give a direction."
   [args]
@@ -27,7 +17,7 @@
     (if target
       (do
         ; move this player
-        (-move-player player/*name* player/*current-room* target direction)
+        (util/move-player player/*name* player/*current-room* target direction)
         ; move followers, inform previous room and new room.
         (doseq [p @(:followers player/*player*)]
           (if (contains? @(:inhabitants previous-room) p)
@@ -36,6 +26,6 @@
                       player/*current-room* (:current-room (@player/players (keyword p)))
                       *out* (player/streams p)]
               (player/tell-player p (str "You follow " following " " direction "."))
-              (-move-player player/*name* player/*current-room* target direction)))))
+              (util/move-player player/*name* player/*current-room* target direction)))))
 
       "You can't go that way.")))

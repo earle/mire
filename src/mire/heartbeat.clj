@@ -1,15 +1,25 @@
 (ns mire.heartbeat
   (:require [clojure.string :as str]
-            [mire.player :as player]
-            [mire.items :as items]
-            [mire.util :as util]
+            [clojure.tools.logging :as log]
             [mire.commands :as commands]
-            [mire.rooms :as rooms]))
+            [mire.items :as items]
+            [mire.mobs :as mobs]
+            [mire.player :as player]
+            [mire.rooms :as rooms]
+            [mire.util :as util]))
+
 
 (defn heartbeat
   "The main heartbeat background process."
   [interval]
-  (println "heartbeat: starting, interval:" interval " seconds.")
+  (log/info "heartbeat starting," (/ interval 1000) "second interval.")
+
   (while true
-    ; handle time sensitive tasks; combat, healing players, moving npcs, etc.
-    (Thread/sleep interval)))
+    (do
+      ;; handle time sensitive tasks; combat, healing players, moving npcs, etc.
+      (Thread/sleep interval)
+
+      ;; move mobs
+      (doseq [[k v] @mobs/mobs :when (:moves v)]
+        (if (< (rand-int 1000) (:moves v))
+          (util/mob-walk k))))))

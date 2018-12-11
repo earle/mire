@@ -1,5 +1,6 @@
 (ns mire.items
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]))
 
 ; All items that exist, and the database of items to clone instances from
 (def items (ref {}))
@@ -74,7 +75,7 @@
 (defn- load-item
   "Load a list of item objects from a file."
   [items file]
-  (println "Loading Items from: " (.getAbsolutePath file))
+  (log/debug "Loading Items from: " (.getAbsolutePath file))
   (let [objs (read-string (slurp (.getAbsolutePath file)))]
     (into {} (map #(create-item items file %) objs))))
 

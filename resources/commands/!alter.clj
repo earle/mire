@@ -29,11 +29,11 @@
                   value (read-string (str/join " " (next cmd)))]
               ;; update the item instance
               (dosync
-                (rooms/tell-room player/*current-room* (str player/*name* " edited the " (items/item-name item) "."))
+                (rooms/tell-others-in-room (str player/*name* " edited the " (items/item-name item) "."))
                 (if (nil? value)
                   (str k " " (pprint/write (k (alter items/items assoc k (dissoc item field))) :stream nil))
                   (str k " " (pprint/write (k (alter items/items assoc-in [k field] value)) :stream nil))))))
-          
+
           ;; is this a mob?
           (if-let [mob (mobs/get-mob k)]
             (if (< (count args) 3)
@@ -43,7 +43,7 @@
                     value (read-string (str/join " " (next cmd)))]
                 ;; update the mob instance
                 (dosync
-                  (rooms/tell-room player/*current-room* (str player/*name* " edited the " (mobs/mob-name mob) "."))
+                  (rooms/tell-others-in-room (str player/*name* " edited the " (mobs/mob-name mob) "."))
                   (if (nil? value)
                     (str k " " (pprint/write (k (alter mobs/mobs assoc k (dissoc mob field))) :stream nil))
                     (str k " " (pprint/write (k (alter mobs/mobs assoc-in [k field] value)) :stream nil))))))

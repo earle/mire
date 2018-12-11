@@ -15,16 +15,15 @@
           (if (contains? @(:inhabitants @player/*current-room*) name)
             (if (= name player/*name*)
               (do
-                (rooms/tell-room @player/*current-room*
-                  (str player/*name* " " emote "s " prep " themself."))
+                (rooms/tell-others-in-room (str player/*name* " " emote "s " prep " themself."))
                 (str "You " emote " " prep " yourself."))
               (do
-                (rooms/tell-room @player/*current-room* (str player/*name* " " emote "s " prep " " name ".") name)
+                (rooms/tell-room @player/*current-room* (str player/*name* " " emote "s " prep " " name ".") #{name})
                 (player/tell-player name (str player/*name* " " emote "s " prep " you."))
                 (str "You " emote " " prep " " name ".")))
             (str name " isn't here.")))))
     (if (> (count args) 0)
       (let [emote (first args)]
-        (rooms/tell-room @player/*current-room* (str player/*name* " " emote "s."))
+        (rooms/tell-others-in-room (str player/*name* " " emote "s."))
         (str "You " emote "."))
       (str "What do you want to emote?"))))

@@ -14,14 +14,13 @@
             [server.socket :as socket]))
 
 
-
 (def players (ref {}))
 
 (defn- cleanup []
   "Player has disconnected."
   (dosync
     ;; tell the room
-    (rooms/tell-room player/*current-room* (str player/*name* " disconnected."))
+    (rooms/tell-others-in-room (str player/*name* " disconnected."))
 
     ;; Remove player stream, remove from room.
     (commute player/streams dissoc player/*name*)
@@ -64,7 +63,7 @@
           (ref-set player/*current-room* (@rooms/rooms :start))
           (commute (:inhabitants @player/*current-room*) conj player/*name*)
           (commute player/streams assoc player/*name* *out*)
-          (rooms/tell-room @player/*current-room* (str player/*name* " entered the world.")))
+          (rooms/tell-others-in-room (str player/*name* " entered the world.")))
 
         (println (commands/execute "look")) (print player/prompt) (flush)
 
@@ -82,9 +81,9 @@
 (defn- init
   [dir]
   (items/add-items (str dir "/items"))
-  (println "Added Items:" (keys @items/items-db))
+  (log/debug "Added Items:" (keys @items/items-db))
   (mobs/add-mobs (str dir "/mobs"))
-  (println "Added Mobs:" (keys @mobs/mobs-db))
+  (log/debug "Added Mobs:" (keys @mobs/mobs-db))
   (rooms/add-rooms (str dir "/rooms"))
   (commands/add-commands (str dir "/commands")))
 
@@ -94,12 +93,12 @@
    (init dir)
 
    (defonce nrepl-server (start-server :port 7888))
-   (println "Launching nREPL server on port 7888")
+   (log/info "Launching nREPL server on port 7888")
 
    (defonce server (socket/create-server (Integer. port) mire-handle-client))
-   (println "Launching Mire server on port" port)
+   (log/info "Launching Mire server on port" port)
 
-   (future (heartbeat/heartbeat 4000)))
+   (heartbeat/heartbeat 4000))
 
   ([port] (-main port "resources"))
 

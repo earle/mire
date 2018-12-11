@@ -31,10 +31,10 @@
               (util/move-between-refs id
                                       (:items @player/*current-room*)
                                       player/*inventory*)
-              (rooms/tell-room @player/*current-room* (str player/*name* " picked up a " name "."))
+              (rooms/tell-others-in-room (str player/*name* " picked up a " name "."))
               (str "You picked up the " name "."))
             (do
-              (rooms/tell-room @player/*current-room* (str player/*name* " tried to pick up a " name ", and failed."))
+              (rooms/tell-others-in-room (str player/*name* " tried to pick up a " name ", and failed."))
               (str "You can't pick up the " name "."))))
 
         ;; is this thing in a container?
@@ -50,9 +50,8 @@
                     (util/move-between-refs id
                                             (:items from)
                                             player/*inventory*)
-                    (rooms/tell-room @player/*current-room*
-                                     (str player/*name* " got a " (items/item-name item)
-                                          " out of a " (items/item-name from) "."))
+                    (rooms/tell-others-in-room (str player/*name* " got a " (items/item-name item))
+                                          " out of a " (items/item-name from) ".")
                     (str "You got a " (items/item-name item) " out of a " (items/item-name from) ".")))
                 (str "There isn't a " what " in the " (items/item-name from) "."))
               (str "There isn't any " (last things) " to get things out of.")))

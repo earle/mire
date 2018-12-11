@@ -13,10 +13,10 @@
       (util/move-between-refs player/*name*
                          (:inhabitants @player/*current-room*)
                          (:inhabitants target))
-      (rooms/tell-room @player/*current-room* (str player/*name* " disappeared in a cloud of smoke."))
+      (rooms/tell-others-in-room (str player/*name* " disappeared in a cloud of smoke."))
       (ref-set player/*current-room* target)
-      (rooms/tell-room @player/*current-room* (str player/*name* " arrived in a cloud of smoke."))
+      (rooms/tell-others-in-room (str player/*name* " arrived in a cloud of smoke."))
       (commands/execute "look"))
-    
+
     ;; Otherwise...
     "No such room."))

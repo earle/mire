@@ -1,5 +1,6 @@
 (ns mire.rooms
-  (:require [mire.player :as player]
+  (:require [clojure.tools.logging :as log]
+            [mire.player :as player]
             [mire.items :as items]
             [mire.mobs :as mobs]))
 
@@ -10,7 +11,7 @@
   "Create a room from a object"
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
-        mobs (ref (or (into #{} (remove nil? (map mobs/clone-mob (:mobs obj)))) #{}))
+        mobs (ref (or (into #{} (remove nil? (map #(mobs/clone-mob % (keyword (:name obj))) (:mobs obj)))) #{}))
         room {(keyword (:name obj)) {:id (keyword (:name obj))
                                      :file (keyword (.getName file))
                                      :desc (:desc obj)
@@ -22,7 +23,7 @@
 
 (defn- load-room [rooms file]
   "Load a list of room objects from a file."
-  (println "Loading Rooms from: " (.getAbsolutePath file))
+  (log/debug "Loading Rooms from: " (.getAbsolutePath file))
   (let [objs (read-string (slurp (.getAbsolutePath file)))]
     (into {} (map #(create-room rooms file %) objs))))
 
@@ -53,8 +54,13 @@
   @(:mobs @player/*current-room*))
 
 (defn tell-room
-  "Send a message to all inhabitants in a room; optionally exclude"
+  "Send a message to all other inhabitants in a room; optionally exclude"
   [room message & exclude]
-  (doseq [inhabitant (disj (others-in-room) (first exclude))]
+  (doseq [inhabitant (remove (set exclude) @(:inhabitants room))]
     (binding [*out* (player/streams inhabitant)]
       (println message))))
+
+(defn tell-others-in-room
+  "Send a message to everyone else in the room"
+  [message]
+  (tell-room @player/*current-room* message player/*name*))

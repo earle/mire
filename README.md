@@ -18,7 +18,7 @@ There are four main types of in-game objects: _Rooms_, _Items_, _Mobs_, and _Pla
 
 ### Rooms
 
-Rooms are defined in files in `resources/`. Rooms are loaded into the
+Rooms are defined in files in `resources/rooms/`. Rooms are loaded into the
 `@rooms/rooms` reference. Each file can contain multiple room objects so rooms can
 be organized by specific areas. Rooms link to other rooms via keywords in the `exits`
 map reference inside the room object. Rooms can contain items, and mobs both which
@@ -47,9 +47,9 @@ are cloned upon game startup and placed within the room.
 
 The `:inhabitants` keyword contains any players that are currently in the room.
 
-## Items
+### Items
 
-Items are defined in files in `resources/`. Items are loaded into the
+Items are defined in files in `resources/items/`. Items are loaded into the
 `@items/items-db` reference. Each file can contain multiple item objects so they can
 be organized by specific types. Each item should have at a minimum a `:name`.
 
@@ -79,6 +79,33 @@ You see a large trunk, and a small dagger.
 You see large trunk, which contains:
 2 red roses.
 ```
+
+### Mobs
+
+Mobs are defined in files in `resources/mobs/`. Mobs are loaded into the
+`@mobs/mobs` reference. Each file can contain multiple mob objects so mobs can
+be organized as you see fit.
+
+Mobs can be set to move around using the keyword `moves`, the value of which is
+the chance that it moves (out of a 1000) during any given _Heartbeat_.
+
+```Clojure
+[{ :name "guard"
+   :aliases ["city guard" "cop"]
+   :sdesc "city guard"
+   :items [:battle-axe]
+   :moves 20},
+ { :name "rat" :aliases [ "rat", "rodent"] :sdesc "small rat"}]
+```
+
+## Heartbeat
+
+The game heartbeat function is the main event driver for game activity. The
+heartbeat is set to run every 4 seconds by default.
+
+Currently the heatbeat controls:
+
+1.  Mob movement
 
 ## Commands
 

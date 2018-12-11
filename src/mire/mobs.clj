@@ -1,5 +1,6 @@
 (ns mire.mobs
   (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]
             [mire.items :as items]))
 
 ; All mobs that exist, and the database of items to mob instances from
@@ -33,14 +34,14 @@
   (mobs-db (keyword name)))
 
 (defn clone-mob
-  "Clone a Mob"
-  [k]
+  "Clone a Mob into a Room"
+  [k room]
   (if-let [mob (mobs-db k)]
     (let [name (str/replace-first k ":" "")
           items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
           id (keyword (str name "-" (count (filter #(= (:name mob) (:name %)) (vals @mobs)))))]
       (dosync
-        (alter mobs conj { id (assoc mob :id id :items items)})
+        (alter mobs conj { id (assoc mob :id id :current-room (ref room) :items items)})
         id))))
 
 (defn- create-mob
@@ -52,7 +53,7 @@
 (defn- load-mob
   "Load a list of mob objects from a file."
   [mobs file]
-  (println "Loading Mobs from: " (.getAbsolutePath file))
+  (log/debug "Loading Mobs from: " (.getAbsolutePath file))
   (let [objs (read-string (slurp (.getAbsolutePath file)))]
     (into {} (map #(create-mob mobs file %) objs))))
 

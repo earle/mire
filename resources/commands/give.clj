@@ -30,7 +30,7 @@
               (util/move-between-refs id player/*inventory* (:items who))
               (rooms/tell-room @player/*current-room*
                                (str player/*name* " gave a " name
-                                    " to " (:name who) ".") (:name who))
+                                    " to " (:name who) ".") (:name who) player/*name*)
               (player/tell-player (:name who)
                                   (str player/*name* " gave you a " name "."))
               (str "You gave a " name " to " (:name who) "."))
@@ -40,8 +40,7 @@
           (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* (last args)))]
             (dosync
               (util/move-between-refs id player/*inventory* (:items mob))
-              (rooms/tell-room @player/*current-room*
-                               (str player/*name* " gave a " name " to the " (:name mob) "."))
+              (rooms/tell-others-in-room (str player/*name* " gave a " name " to the " (:name mob) "."))
               (str "You gave a " name " to the " (:name mob) "."))
             (str "There isn't a " (last args) " here.")))
         (str "You dont have a " thing " to give.")))

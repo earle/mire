@@ -1,7 +1,8 @@
 (ns mire.commands
   (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]
             [mire.player :as player]))
-          
+
 ;; Commands (dynamically loaded from individual files)
 (def commands (ref {}))
 
@@ -26,7 +27,7 @@
   [commands file]
   (let [filename (.getName file)
         command (first (str/split filename #"\."))]
-    (println (str "Loading Command: '" command "' from: " (.getAbsolutePath file)))
+    (log/debug "Loading Command:" command "from:" (.getAbsolutePath file))
     (-> file
         .getAbsolutePath
         load-file)
