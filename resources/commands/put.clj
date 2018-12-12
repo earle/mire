@@ -31,8 +31,8 @@
                                         (:items from-ref)
                                         (:items to))
 
-                (rooms/tell-others-in-room (str player/*name* " put a " (items/item-name item))
-                                      " into the " (items/item-name to) ".")
+                (rooms/tell-others-in-room (str player/*name* " put a " (items/item-name item)
+                                             " into the " (items/item-name to) "."))
                 (str "You put a " (items/item-name item) " into the " (items/item-name to) ".")))
             (str "There isn't any " thing " here."))
           (str "You can't put things into the " (items/item-name to) "."))

@@ -10,7 +10,7 @@
   [args]
   (let [direction (first args)
         target-name ((:exits @player/*current-room*) (keyword direction))
-        target (@rooms/rooms target-name)
+        target (rooms/rooms target-name)
         previous-room @player/*current-room*
         following player/*name*]
 

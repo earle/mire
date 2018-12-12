@@ -115,7 +115,7 @@
   [p from to direction]
   (dosync
     ; move this player, inform the previous room and new room
-    (move-between-refs p (:inhabitants @from) (:inhabitants to))
+    (move-between-refs p (from :inhabitants) (to :inhabitants))
     (rooms/tell-room @from (str p " went " (name direction) ".") p)
     (ref-set from to)
     (rooms/tell-room to (str p " arrived.") p)
@@ -129,7 +129,7 @@
           current-room @(:current-room mob)
           from (rooms/rooms current-room)
           to (rooms/rooms (direction @(:exits from)))]
-      (log/debug "move-mob:" m current-room direction "," (from :id) "->" (to :id))
+      (log/debug "move-mob:" m "from" current-room direction " to " (to :id))
       (move-between-refs m (from :mobs) (to :mobs))
       (rooms/tell-room from (str "The " (mobs/mob-name mob) " went " (name direction) "."))
       (ref-set (:current-room mob) (to :id))

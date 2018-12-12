@@ -5,7 +5,7 @@
             [mire.util :as util]
             [mire.player :as player]))
 
-(defn -look-at-inventory
+(defn- look-at-inventory
   "See what a ref is carrying"
   [obj]
   (if (> (count @(:items obj)) 0)
@@ -43,11 +43,11 @@
                  (items/item-desc item) ".")))
         ; If its not an item, is it a Mob?
         (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* thing))]
-          (str "The " (mobs/mob-name mob) " is carrying:\n" (-look-at-inventory mob))
-          
+          (str "The " (mobs/mob-name mob) " is carrying:\n" (look-at-inventory mob))
+
           ;; If it's not an Item or a Mob, is it a Player?
           (if-let [p (player/get-player thing)]
-            (str (:name p) " is carrying:\n" (-look-at-inventory p))
+            (str (:name p) " is carrying:\n" (look-at-inventory p))
             (str "There is no " thing " here.")))))
     ; Otherwise, what's in the room?
     (let [exits (map name (keys @(:exits @player/*current-room*)))

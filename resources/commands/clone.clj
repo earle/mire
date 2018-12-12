@@ -25,7 +25,6 @@
             (alter (player/*current-room* :mobs) conj id)
             (rooms/tell-others-in-room (str player/*name* " cloned a "
                                          (mobs/mob-name (mobs/get-mob id)) "."))
-            (str "You cloned a " (util/inspect-object (mobs/get-mob id))
-                 "."))
-          (str "Specify a valid mob to clone."))))
+            (str "You cloned a " (util/inspect-object (mobs/get-mob id) ".")))
+          (str "Specify a valid thing to clone."))))
     (str "Usage: 'clone :keyword'")))

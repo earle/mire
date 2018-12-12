@@ -18,7 +18,7 @@
                 (rooms/tell-others-in-room (str player/*name* " " emote "s " prep " themself."))
                 (str "You " emote " " prep " yourself."))
               (do
-                (rooms/tell-room @player/*current-room* (str player/*name* " " emote "s " prep " " name ".") #{name})
+                (rooms/tell-room @player/*current-room* (str player/*name* " " emote "s " prep " " name ".") name player/*name*)
                 (player/tell-player name (str player/*name* " " emote "s " prep " you."))
                 (str "You " emote " " prep " " name ".")))
             (str name " isn't here.")))))

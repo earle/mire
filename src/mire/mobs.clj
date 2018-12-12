@@ -63,8 +63,8 @@
   [mobs dir]
   (dosync
    (reduce load-mob mobs (-> dir
-                               java.io.File.
-                               .listFiles))))
+                             java.io.File.
+                             .listFiles))))
 
 (defn add-mobs
   "Look through all the files in a dir for files describing mobs and add
