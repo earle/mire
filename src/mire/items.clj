@@ -13,6 +13,18 @@
     (into (sorted-map) (id @items))
     nil))
 
+(defn generate-id
+  "Generate IDs for Items"
+  [obj]
+  (let [n (atom 0)
+        name (str/replace-first obj ":" "")
+        k (atom (keyword (str name "-" @n)))]
+    (while (get-item @k)
+      (do
+        (swap! n inc)
+        (reset! k (keyword (str name "-" @n)))))
+    @k))
+
 (defn container?
   "Is this item a container of other items?"
   [item]
@@ -57,8 +69,7 @@
   "Clone an Item"
   [k]
   (if-let [item (items-db k)]
-    (let [name (str/replace-first k ":" "")
-          id (keyword (str name "-" (count (filter #(= (:name item) (:name %)) (vals @items)))))]
+    (let [id (generate-id k)]
       (dosync
         (alter items conj { id (assoc item :id id)})
         id))))

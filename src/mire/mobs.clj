@@ -14,6 +14,18 @@
     (into (sorted-map) (id @mobs))
     nil))
 
+(defn generate-id
+  "Generate IDs for Mobs"
+  [obj]
+  (let [n (atom 0)
+        name (str/replace-first obj ":" "")
+        k (atom (keyword (str name "-" @n)))]
+    (while (get-mob @k)
+      (do
+        (swap! n inc)
+        (reset! k (keyword (str name "-" @n)))))
+    @k))
+
 (defn mob-name
   "Get the short description of a mob if it exists"
   [mob]
@@ -37,9 +49,8 @@
   "Clone a Mob into a Room"
   [k room]
   (if-let [mob (mobs-db k)]
-    (let [name (str/replace-first k ":" "")
-          items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
-          id (keyword (str name "-" (count (filter #(= (:name mob) (:name %)) (vals @mobs)))))]
+    (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
+          id (generate-id k)]
       (dosync
         (alter mobs conj { id (assoc mob :id id :current-room (ref room) :items items)})
         id))))

@@ -21,5 +21,6 @@
 
       ;; move mobs
       (doseq [[k v] @mobs/mobs :when (:moves v)]
-        (if (< (rand-int 1000) (:moves v))
-          (util/mob-walk k))))))
+        (let [r (rand-int 1000)]
+          (if (< r (:moves v))
+            (util/mob-walk k)))))))
