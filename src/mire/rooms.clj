@@ -7,6 +7,13 @@
 ;; state for all rooms
 (def rooms (ref {}))
 
+(defn- update-mobs-in-room
+  "Update :current-room in Mobs after Room creation"
+  []
+  (doseq [[k v] @mobs/mobs]
+    (let [r ((mobs/mobs k) :current-room)]
+      (ref-set r (rooms @r)))))
+
 (defn- create-room
   "Create a room from a object"
   [rooms file obj]
@@ -43,8 +50,10 @@
   them to the mire.rooms/rooms map."
   [dir]
   (dosync
-    (alter rooms load-rooms dir)))
+    (alter rooms load-rooms dir)
     ;; update mobs in room to set their :current-room properly
+    (update-mobs-in-room)))
+
 
 (defn others-in-room
   "Other people in the current room"

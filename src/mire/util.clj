@@ -122,22 +122,22 @@
     (player/tell-player p (commands/execute "look"))))
 
 (defn move-mob
-  "Move a mob from one Room to another"
+  "Move a mob in a direction (must exist)"
   [m direction]
   (dosync
-    (let [mob (m @mobs/mobs)
-          current-room @(:current-room mob)
-          from (rooms/rooms current-room)
-          to (rooms/rooms (direction @(:exits from)))]
-      (log/debug "move-mob:" m "from" current-room direction " to " (to :id))
+    (let [mob (@mobs/mobs m)
+          current-room @(mob :current-room)
+          from (mob :current-room)
+          to (rooms/rooms (direction @(from :exits)))]
+      (log/debug "move-mob:" m "from" (:id current-room) "," direction "->" (to :id))
       (move-between-refs m (from :mobs) (to :mobs))
-      (rooms/tell-room from (str "The " (mobs/mob-name mob) " went " (name direction) "."))
-      (ref-set (:current-room mob) (to :id))
+      (rooms/tell-room @from (str "The " (mobs/mob-name mob) " went " (name direction) "."))
+      (ref-set (:current-room mob) to)
       (rooms/tell-room to (str "A " (mobs/mob-name mob) " arrived.")))))
 
 (defn mob-walk
   "Move a mob to a random exit"
   [m]
   (if-let [mob (@mobs/mobs m)]
-    (if-let [room (@rooms/rooms @(mob :current-room))]
+    (if-let [room @(mob :current-room)]
       (move-mob m (rand-nth (keys @(room :exits)))))))
