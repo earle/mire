@@ -19,7 +19,7 @@
           ;; locate this item (rooms, players, other items)
           ;; remove it from its parent and destroy the instance
           (rooms/tell-others-in-room (str player/*name* " destroyed the "
-                                       (items/item-name item)) ".")
+                                          (items/item-name item) "."))
           (str "You destroyed " (util/inspect-object item) "."))
 
         ;; ....or is it a Mob?

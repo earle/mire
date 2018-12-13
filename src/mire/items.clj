@@ -78,8 +78,6 @@
   "Create an item from a object"
   [items file obj]
   (if (:container obj)
-    ;; If this is a container, clone default items into it
-    ;; XXX: have to post-process this since the items references may not be created yet
     (conj items {(keyword (:name obj)) (assoc obj :items (ref #{}))})
     (conj items {(keyword (:name obj)) obj})))
 

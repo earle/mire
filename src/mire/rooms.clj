@@ -11,6 +11,8 @@
   "Create a room from a object"
   [rooms file obj]
   (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
+        ;; clone the mobs, set their :current-room to the keyword of this room which
+        ;; we will post-process to assign the room's ref after the rooms are added.
         mobs (ref (or (into #{} (remove nil? (map #(mobs/clone-mob % (keyword (:name obj))) (:mobs obj)))) #{}))
         room {(keyword (:name obj)) {:id (keyword (:name obj))
                                      :file (keyword (.getName file))
@@ -42,6 +44,7 @@
   [dir]
   (dosync
     (alter rooms load-rooms dir)))
+    ;; update mobs in room to set their :current-room properly
 
 (defn others-in-room
   "Other people in the current room"
