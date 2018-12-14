@@ -26,10 +26,10 @@
           (dosync
             ;; make sure the mobs current room is a real ref
             (if (instance? clojure.lang.Ref (mob :current-room))
-              (if-let [room (rooms/rooms @(mob :current-room))]
+              (if-let [room (rooms/rooms ((mob :current-room) :id))]
                 (do
                   ;; remove mob from room
-                  (alter (room :mobs) disj k)
+                  (alter ((mob :current-room) :mobs) disj k)
                   (rooms/tell-room room (str player/*name* " destroyed the "
                                                   (mobs/mob-name mob) ".") player/*name*))))
             ;; remove instance from the world

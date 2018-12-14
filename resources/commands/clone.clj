@@ -16,7 +16,7 @@
           (rooms/tell-others-in-room (str player/*name* " cloned a "
                                        (items/item-name (items/get-item id)) "."))
           (str "You cloned " (util/inspect-object (items/get-item id)) "."))
-        (if-let [id (mobs/clone-mob k (player/*current-room* :id))]
+        (if-let [id (mobs/clone-mob k player/*current-room*)]
           (dosync
 
             (alter (player/*current-room* :mobs) conj id)

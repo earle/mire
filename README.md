@@ -24,8 +24,9 @@ be organized by specific areas. Rooms link to other rooms via keywords in the `e
 map reference inside the room object. Rooms can contain items, and mobs both which
 are cloned upon game startup and placed within the room.
 
+`/resources/rooms/city.clj:`
+
 ```clojure
-/resources/rooms/city.clj:
 [{ :id :start
    :desc "You are in a round room with a pillar in the middle."
    :exits {:north :closet :south :hallway}
@@ -48,13 +49,13 @@ are cloned upon game startup and placed within the room.
 
 #### Room Attributes
 
-`:id`: the keyword to uniquely identify a room
-`:area`: a string to name the area of the world a room is in (calculated from filename)
-`:desc`: a description of the room
-`:exits`: a map to provide links to adjoining rooms
-`:inhabitants`: any players that are currently in the room
-`:items`: items that should be cloned into this room when its initialized
-`:mobs`: mobs that should be cloned into this room when its initialized
+-   `:id`: the keyword to uniquely identify a room
+-   `:area`: a string to name the area of the world a room is in (_calculated from filename_)
+-   `:desc`: a description of the room
+-   `:exits`: a map to provide links to adjoining rooms
+-   `:inhabitants`: any players that are currently in the room
+-   `:items`: items that should be cloned into this room when its initialized
+-   `:mobs`: mobs that should be cloned into this room when its initialized
 
 ### Items
 
@@ -62,8 +63,9 @@ Items are defined in files in `resources/items/`. Items are loaded into the
 `@items/items-db` reference. Each file can contain multiple item objects so they can
 be organized by specific categories. Each item should have at a minimum a `:name`.
 
+`/resources/items/weapons.clj`
+
 ```Clojure
-/resources/items/weapons.clj
 [{ :name "dagger" :sdesc "small dagger"}
  { :name "battle-axe" :aliases [ "axe" "battle axe" ] :sdesc "bronze battle axe"}]
 ```
@@ -78,13 +80,13 @@ user=> (:dagger-0 @items/items)
 
 #### Item Attributes
 
-`:id`: a keyword to uniquely identify a specific instance of an item (generated upon cloning)
-`:name`: a string and unique name for this item
-`:aliases`: a list of strings to access an instance of this item in gameplay
-`:category`: a string to categorize an item (calculated from filename)
-`:sdesc`: a short description of the item
-`:container`: boolean if this item can contain other Items
-`:moveable`: boolean if this item can be picked up or not
+-   `:id`: a keyword to uniquely identify a specific instance of an item (_generated upon cloning_)
+-   `:name`: a string and unique name for this item
+-   `:aliases`: a list of strings to access an instance of this item in gameplay
+-   `:category`: a string to categorize an item (_calculated from filename_)
+-   `:sdesc`: a short description of the item
+-   `:container`: boolean if this item can contain other Items
+-   `:moveable`: boolean if this item can be picked up or not
 
 ```Clojure
 > look
@@ -106,6 +108,8 @@ be organized as you see fit.
 Mobs can be set to move around using the keyword `moves`, the value of which is
 the chance that it moves (out of a 1000) during any given _Heartbeat_.
 
+`/resources/mobs/basic.clj.clj`
+
 ```Clojure
 [{ :name "guard"
    :aliases ["city guard" "cop"]
@@ -117,13 +121,13 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
 
 #### Mob Attributes
 
-`:id`: a keyword to uniquely identify a specific instance (generated upon cloning)
-`:name`: a string and unique name for this mob
-`:aliases`: a list of strings to access an instance of this mob in gameplay
-`:category`: a string to categorize mobs (calculated from filename)
-`:sdesc`: a short description of the mob
-`:items`: a ref set of item instances carried by this mob
-`:moves`: optional integer determining the rate this mob moves around
+-   `:id`: a keyword to uniquely identify a specific instance (_generated upon cloning_)
+-   `:name`: a string and unique name for this mob
+-   `:aliases`: a list of strings to access an instance of this mob in gameplay
+-   `:category`: a string to categorize mobs (_calculated from filename_)
+-   `:sdesc`: a short description of the mob
+-   `:items`: a ref set of item instances carried by this mob
+-   `:moves`: optional integer determining the rate this mob moves around
 
 ## Heartbeat
 
@@ -168,7 +172,14 @@ Example command `discard`:
 
 ## Wiz
 
-To create an item, use `clone`.
+### Cloning
+
+To create an item, use `clone`. Cloning takes a keyword representing either an entry in `@items/items-db`
+or `@mobs/mobs-db`, and instantiates an object into the `@items/items` or `@mobs/mobs` reference. The cloned
+item is given a unique `:id` based on the name of the object, and the number of existing instances in play.
+
+Cloning a _mob_ places it in the current room of the player, and cloning an _item_ places it in the inventory
+of the player.
 
 ```Clojure
 > clone :dagger
@@ -179,6 +190,8 @@ To inspect an item, mob, or player in the current room or your inventory: `inspe
 or `inspect guard` &ndash; to inspect a specific item instance: `inspect :dagger-0`.  
 To inspect everything in the room it's simply `inspect` &ndash; for everything
 you are carrying it's `inspect inventory`.
+
+### Inspecting
 
 ```Clojure
 > inspect axe
@@ -212,7 +225,9 @@ To inspect everything in the room: `inspect`:
      :sdesc "city guard"})}
 ```
 
-To modify the instance of an item:
+### Modifying instances
+
+To modify the instance of an object, use `alter`.
 
 ```Clojure
 > clone :dagger

@@ -29,6 +29,7 @@
                   :exits (ref (:exits obj))
                   :inhabitants (ref #{})
                   :mobs mobs
+                  :generate (:generate obj)
                   :items items}}]
     (conj rooms room)))
 
@@ -55,7 +56,6 @@
     (alter rooms load-rooms dir)
     ;; update mobs in room to set their :current-room properly
     (update-mobs-in-room)))
-
 
 (defn others-in-room
   "Other people in the current room"
