@@ -1,5 +1,6 @@
 (ns mire.rooms
-  (:require [clojure.tools.logging :as log]
+  (:require [clojure.string :as str]
+            [clojure.tools.logging :as log]
             [mire.player :as player]
             [mire.items :as items]
             [mire.mobs :as mobs]))
@@ -17,17 +18,18 @@
 (defn- create-room
   "Create a room from a object"
   [rooms file obj]
-  (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
+  (let [id (keyword (:id obj))
+        items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
         ;; clone the mobs, set their :current-room to the keyword of this room which
         ;; we will post-process to assign the room's ref after the rooms are added.
-        mobs (ref (or (into #{} (remove nil? (map #(mobs/clone-mob % (keyword (:name obj))) (:mobs obj)))) #{}))
-        room {(keyword (:name obj)) {:id (keyword (:name obj))
-                                     :file (keyword (.getName file))
-                                     :desc (:desc obj)
-                                     :exits (ref (:exits obj))
-                                     :inhabitants (ref #{})
-                                     :mobs mobs
-                                     :items items}}]
+        mobs (ref (or (into #{} (remove nil? (map #(mobs/clone-mob % id) (:mobs obj)))) #{}))
+        room {id {:id id
+                  :area (str/replace (.getName file) ".clj" "")
+                  :desc (:desc obj)
+                  :exits (ref (:exits obj))
+                  :inhabitants (ref #{})
+                  :mobs mobs
+                  :items items}}]
     (conj rooms room)))
 
 (defn- load-room [rooms file]

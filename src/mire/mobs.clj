@@ -58,7 +58,7 @@
 (defn- create-mob
   "Create a mob database entry from a object"
   [mobs file obj]
-  (let [mob {(keyword (:name obj)) (assoc obj :file (.getName file))}]
+  (let [mob {(keyword (:name obj)) (assoc obj :category (str/replace (.getName file) ".clj" ""))}]
     (conj mobs mob)))
 
 (defn- load-mob

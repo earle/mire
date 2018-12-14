@@ -77,9 +77,10 @@
 (defn- create-item
   "Create an item from a object"
   [items file obj]
-  (if (:container obj)
-    (conj items {(keyword (:name obj)) (assoc obj :items (ref #{}))})
-    (conj items {(keyword (:name obj)) obj})))
+  (let [id (keyword (:name obj))]
+    (if (:container obj)
+      (conj items {id (assoc obj :items (ref #{}) :category (str/replace (.getName file) ".clj" ""))})
+      (conj items {id (assoc obj :category (str/replace (.getName file) ".clj" ""))}))))
 
 (defn- load-item
   "Load a list of item objects from a file."

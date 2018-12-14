@@ -129,7 +129,7 @@
           current-room @(mob :current-room)
           from (mob :current-room)
           to (rooms/rooms (direction @(from :exits)))]
-      (log/debug "move-mob:" m "from" (:id current-room) "," direction "->" (to :id))
+      (log/debug "move-mob:" m "from" (:id current-room) direction "to" (to :id))
       (move-between-refs m (from :mobs) (to :mobs))
       (rooms/tell-room @from (str "The " (mobs/mob-name mob) " went " (name direction) "."))
       (ref-set (:current-room mob) to)

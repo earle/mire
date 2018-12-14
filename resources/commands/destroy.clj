@@ -5,8 +5,6 @@
             [mire.items :as items]
             [mire.player :as player]))
 
-; destroy :dagger-0
-
 (defn destroy
   "Destroy an instance of something"
   [args]

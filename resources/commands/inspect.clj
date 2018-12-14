@@ -42,15 +42,15 @@
         (if (or (> (count carrying-ids) 0) (> (count inroom-ids) 0) (> (count mob-ids) 0))
           (str
             (if (> (count mob-ids) 0)
-              (str "Mobs:\n" (util/inspect-object (->> mob-ids (map mobs/get-mob))) "\n"))
+              (str "Mobs:\n" (->> mob-ids (map mobs/get-mob) (util/inspect-object))))
             (if (> (count carrying-ids) 0)
-              (str "Carrying:\n" (util/inspect-object (->> carrying-ids (map items/get-item))) "\n"))
+              (str "Carrying:\n" (->> carrying-ids (map items/get-item) (util/inspect-object))))
             (if (> (count inroom-ids) 0)
-              (str "In Room:\n" (util/inspect-object (->> inroom-ids (map items/get-item))) "\n")))
+              (str "In Room:\n"  (->> inroom-ids (map items/get-item) (util/inspect-object)))))
 
           ;; did we specify the current room explicitly?
           (if (= name "inventory")
-            (str "Carrying:\n" (util/inspect-object (->> @player/*inventory* (map items/get-item))) "\n")
+            (str "Carrying:\n" (->> @player/*inventory* (map items/get-item) (util/inspect-object)))
             ;; Is this a player?
             (if-let [p ((keyword (str/capitalize name)) @player/players)]
               (util/inspect-object p)

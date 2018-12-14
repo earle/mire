@@ -87,7 +87,6 @@
   (rooms/add-rooms (str dir "/rooms"))
   (commands/add-commands (str dir "/commands")))
 
-
 (defn -main
   ([port dir]
    (init dir)

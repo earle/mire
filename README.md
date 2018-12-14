@@ -25,38 +25,47 @@ map reference inside the room object. Rooms can contain items, and mobs both whi
 are cloned upon game startup and placed within the room.
 
 ```clojure
-{ :name "start"
+/resources/rooms/city.clj:
+[{ :id :start
    :desc "You are in a round room with a pillar in the middle."
    :exits {:north :closet :south :hallway}
    :items [:fountain :dagger]
    :mobs [:guard :guard :guard :rat :rat]}
 
- { :name "closet"
+ { :id :closet
    :desc "You are in a cramped closet."
    :exits {:south :start}
    :items [:dagger :trunk]}
 
- { :name "hallway"
+ { :id :hallway
    :desc "You are in a long, low-lit hallway that turns to the east."
    :exits {:north :start :east :promenade}}
 
- { :name "promenade"
+ { :id :promnade
    :desc "The promenade stretches out before you."
    :exits {:west :hallway :east :forest}}]
 ```
 
-The `:inhabitants` keyword contains any players that are currently in the room.
+#### Room Attributes
+
+`:id`: the keyword to uniquely identify a room
+`:area`: a string to name the area of the world a room is in (calculated from filename)
+`:desc`: a description of the room
+`:exits`: a map to provide links to adjoining rooms
+`:inhabitants`: any players that are currently in the room
+`:items`: items that should be cloned into this room when its initialized
+`:mobs`: mobs that should be cloned into this room when its initialized
 
 ### Items
 
 Items are defined in files in `resources/items/`. Items are loaded into the
 `@items/items-db` reference. Each file can contain multiple item objects so they can
-be organized by specific types. Each item should have at a minimum a `:name`.
+be organized by specific categories. Each item should have at a minimum a `:name`.
 
 ```Clojure
+/resources/items/weapons.clj
 [{ :name "dagger" :sdesc "small dagger"}
- { :name "battle-axe" :aliases [ "axe" "battle axe" ] :sdesc "bronze battle axe"}
- { :name "trunk" :sdesc "large trunk" :moveable false :container true}]
+ { :name "battle-axe" :aliases [ "axe" "battle axe" ] :sdesc "bronze battle axe"}]
 ```
 
 Individual instances of items are cloned into `@items/items`. Each item is cloned given
@@ -67,7 +76,15 @@ user=> (:dagger-0 @items/items)
 {:name "dagger", :sdesc "small dagger", :id :dagger-0}
 ```
 
-Item's can be containers to hold other items by setting the `:container` flag to true.
+#### Item Attributes
+
+`:id`: a keyword to uniquely identify a specific instance of an item (generated upon cloning)
+`:name`: a string and unique name for this item
+`:aliases`: a list of strings to access an instance of this item in gameplay
+`:category`: a string to categorize an item (calculated from filename)
+`:sdesc`: a short description of the item
+`:container`: boolean if this item can contain other Items
+`:moveable`: boolean if this item can be picked up or not
 
 ```Clojure
 > look
@@ -97,6 +114,16 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
    :moves 20},
  { :name "rat" :aliases [ "rat", "rodent"] :sdesc "small rat"}]
 ```
+
+#### Mob Attributes
+
+`:id`: a keyword to uniquely identify a specific instance (generated upon cloning)
+`:name`: a string and unique name for this mob
+`:aliases`: a list of strings to access an instance of this mob in gameplay
+`:category`: a string to categorize mobs (calculated from filename)
+`:sdesc`: a short description of the mob
+`:items`: a ref set of item instances carried by this mob
+`:moves`: optional integer determining the rate this mob moves around
 
 ## Heartbeat
 
@@ -148,7 +175,7 @@ To create an item, use `clone`.
 You cloned {:id :dagger-2, :name "dagger", :sdesc "small dagger"}.
 ```
 
-To inspect an item or player in the current room or your inventory: `inspect dagger`
+To inspect an item, mob, or player in the current room or your inventory: `inspect dagger`
 or `inspect guard` &ndash; to inspect a specific item instance: `inspect :dagger-0`.  
 To inspect everything in the room it's simply `inspect` &ndash; for everything
 you are carrying it's `inspect inventory`.
@@ -170,14 +197,14 @@ To inspect everything in the room: `inspect`:
  :desc "You are in a long, low-lit hallway that turns to the east.",
  :exits
    #object[clojure.lang.Ref 0x3b20c8f2 {:status :ready, :val {:north :start, :east :promenade}}],
- :file :city.clj,
+ :area "city"
  :inhabitants
    #object[clojure.lang.Ref 0x3115ee96 {:status :ready, :val #{"Alice"}}],
  :items ({:id :rose-3, :name "rose", :aliases ["red rose"], :sdesc "red rose"}),
  :mobs
    ({:id :guard-3,
      :name "guard",
-     :file "basic.clj",
+     :category "basic",
      :items ({:id :battle-axe-6,
               :name "battle-axe",
               :aliases ["axe" "battle axe"],
