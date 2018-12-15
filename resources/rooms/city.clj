@@ -2,7 +2,7 @@
    :desc "You are in a round room with a pillar in the middle."
    :exits {:north :closet :south :hallway}
    :items [:fountain :dagger]
-   :mobs [:guard :guard :guard :rat :rat]}
+   :mobs [:guard :guard :peasant :peasant]}
 
  { :id :closet
    :desc "You are in a cramped closet."

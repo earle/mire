@@ -22,7 +22,9 @@ Rooms are defined in files in `resources/rooms/`. Rooms are loaded into the
 `@rooms/rooms` reference. Each file can contain multiple room objects so rooms can
 be organized by specific areas. Rooms link to other rooms via keywords in the `exits`
 map reference inside the room object. Rooms can contain items, and mobs both which
-are cloned upon game startup and placed within the room.
+are cloned upon game startup and placed within the room. Rooms can also _generate_
+mobs when there are players in the room using the `:generate` keyword described below
+in _Mob Generation_.
 
 `/resources/rooms/city.clj:`
 
@@ -47,6 +49,25 @@ are cloned upon game startup and placed within the room.
    :exits {:west :hallway :east :forest}}]
 ```
 
+#### Mob Generation
+
+Rooms can generate mobs while `:inhabitants` contains at least one _Player_. Mob generation
+is handled as part of the system _Heartbeat_. The `:generate` keyword takes a map describing
+which mobs to generate, the rate at which they are generated (1000 sided dice roll), and the
+maximum number that should be created in the room. Mobs will randomly leave the room after a
+period of time, which is handled in _Heartbeat_ as well.
+
+To generate mobs in a room:
+
+```Clojure
+[{:id :forest
+  :desc "You are in the forest."
+  :exits {:west :promenade}
+  :generate {:rat {:max 3 :rate 45}
+             :deer {:max 2 :rate 15}
+             :raccoon {:max 3 :rate 45}}}]
+```
+
 #### Room Attributes
 
 -   `:id`: the keyword to uniquely identify a room
@@ -56,6 +77,7 @@ are cloned upon game startup and placed within the room.
 -   `:inhabitants`: any players that are currently in the room
 -   `:items`: items that should be cloned into this room when its initialized
 -   `:mobs`: mobs that should be cloned into this room when its initialized
+-   `:generate`: map describing mobs to generate in this room
 
 ### Items
 
