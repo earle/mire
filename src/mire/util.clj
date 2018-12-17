@@ -134,6 +134,7 @@
         ;; Remove from :current-room, create a corpse in :current-room containing :items
         (alter (room :mobs) disj k)
         (alter items/items assoc-in [corpse :sdesc] (str (mobs/mob-name mob) " corpse"))
+        (alter items/items assoc-in [corpse :aliases] [(str (:name mob) " corpse"), (str (mobs/mob-name mob) " corpse")])
         (alter (room :items) conj corpse)
         ;; inform the room the mob has died
         (rooms/tell-room @room (str "The " (mobs/mob-name mob) " has died from its wounds."))

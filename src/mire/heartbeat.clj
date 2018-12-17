@@ -51,7 +51,6 @@
                     (rooms/tell-room @room (str "A " (mobs/mob-name mob) " arrived."))
                     (log/debug "generate-mob:" id "in" (:id @room)))))))))
 
-
       ;; move mobs
       (doseq [[k v] @mobs/mobs :when (:moves v)]
         (let [r (rand-int 1000)]

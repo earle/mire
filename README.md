@@ -102,12 +102,13 @@ user=> (:dagger-0 @items/items)
 
 #### Item Attributes
 
--   `:id`: a keyword to uniquely identify a specific instance of an item (_generated upon cloning_)
--   `:name`: a string and unique name for this item
+-   `:id`: a keyword to uniquely identify a specific instance of an item (_generated upon cloning_) _required_
+-   `:sdesc`: a short description of the item _required_
 -   `:aliases`: a list of strings to access an instance of this item in gameplay
 -   `:category`: a string to categorize an item (_calculated from filename_)
--   `:sdesc`: a short description of the item
 -   `:container`: boolean if this item can contain other Items
+-   `:decay`: seconds that it takes for this item to decay &ndash; _corpses, food, etc_
+-   `:name`: a string and unique name for this item
 -   `:moveable`: boolean if this item can be picked up or not
 
 ```Clojure
@@ -156,10 +157,11 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
 The game heartbeat function is the main event driver for game activity. The
 heartbeat is set to run every 4 seconds by default.
 
-Currently the heatbeat controls:
+Currently the _Heartbeat_ controls:
 
 1.  Mob movement
 2.  Mob Generation for rooms with Players, and periodic removal of those mobs.
+3.  Item Decay (corpses, food, etc)
 
 ## Commands
 
