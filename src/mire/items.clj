@@ -71,7 +71,7 @@
   (if-let [item (items-db k)]
     (let [id (generate-id k)]
       (dosync
-        (alter items conj { id (assoc item :id id)})
+        (alter items conj { id (assoc item :id id :created (quot (System/currentTimeMillis) 1000))})
         id))))
 
 (defn- create-item

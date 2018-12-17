@@ -52,7 +52,8 @@
     (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
           id (generate-id k)]
       (dosync
-        (alter mobs conj { id (assoc mob :id id :current-room (ref room) :items items)})
+        (alter mobs conj { id (assoc mob :id id :created (quot (System/currentTimeMillis) 1000)
+                                         :current-room (ref room) :items items)})
         id))))
 
 (defn- create-mob

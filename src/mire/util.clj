@@ -121,6 +121,26 @@
     (rooms/tell-room to (str p " arrived.") p)
     (player/tell-player p (commands/execute "look"))))
 
+
+(defn kill-mob
+  "Kill a mob, creating a corpse"
+  [k]
+  (if-let [mob (mobs/get-mob k)]
+    (let [room (mob :current-room)
+          corpse (items/clone-item :corpse)]
+      (dosync
+        ;; Move items from Mob to corpse
+        (ref-set (:items (items/get-item corpse)) @(:items mob))
+        ;; Remove from :current-room, create a corpse in :current-room containing :items
+        (alter (room :mobs) disj k)
+        (alter items/items assoc-in [corpse :sdesc] (str (mobs/mob-name mob) " corpse"))
+        (alter (room :items) conj corpse)
+        ;; inform the room the mob has died
+        (rooms/tell-room @room (str "The " (mobs/mob-name mob) " has died from its wounds."))
+        ;; remove mob instance from world
+        (alter mobs/mobs dissoc k)))))
+
+
 (defn move-mob
   "Move a mob in a direction (must exist)"
   [m direction]

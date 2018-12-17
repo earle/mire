@@ -50,8 +50,8 @@
                     (util/move-between-refs id
                                             (:items from)
                                             player/*inventory*)
-                    (rooms/tell-others-in-room (str player/*name* " got a " (items/item-name item))
-                                          " out of a " (items/item-name from) ".")
+                    (rooms/tell-others-in-room (str player/*name* " got a " (items/item-name item)
+                                                 " out of a " (items/item-name from) "."))
                     (str "You got a " (items/item-name item) " out of a " (items/item-name from) ".")))
                 (str "There isn't a " what " in the " (items/item-name from) "."))
               (str "There isn't any " (last things) " to get things out of.")))

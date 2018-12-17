@@ -159,6 +159,7 @@ heartbeat is set to run every 4 seconds by default.
 Currently the heatbeat controls:
 
 1.  Mob movement
+2.  Mob Generation for rooms with Players, and periodic removal of those mobs.
 
 ## Commands
 
