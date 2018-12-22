@@ -28,6 +28,7 @@
           (if (contains? (rooms/others-in-room) (:name who))
             (dosync
               (util/move-between-refs id player/*inventory* (:items who))
+              (ref-set (:parent item) (:name who))
               (rooms/tell-room @player/*current-room*
                                (str player/*name* " gave a " name
                                     " to " (:name who) ".") (:name who) player/*name*)
@@ -40,6 +41,7 @@
           (if-let [mob (mobs/get-mob (util/find-mob-in-room @player/*current-room* (last args)))]
             (dosync
               (util/move-between-refs id player/*inventory* (:items mob))
+              (ref-set (:parent item) (:id mob))
               (rooms/tell-others-in-room (str player/*name* " gave a " name " to the " (:name mob) "."))
               (str "You gave a " name " to the " (:name mob) "."))
             (str "There isn't a " (last args) " here.")))

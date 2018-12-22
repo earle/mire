@@ -8,18 +8,11 @@
 ;; state for all rooms
 (def rooms (ref {}))
 
-(defn- update-mobs-in-room
-  "Update :current-room in Mobs after Room creation"
-  []
-  (doseq [[k v] @mobs/mobs]
-    (let [r ((mobs/mobs k) :current-room)]
-      (ref-set r (rooms @r)))))
-
 (defn- create-room
   "Create a room from a object"
   [rooms file obj]
   (let [id (keyword (:id obj))
-        items (ref (or (into #{} (remove nil? (map items/clone-item (:items obj)))) #{}))
+        items (ref (or (into #{} (remove nil? (map #(items/clone-item % id) (:items obj)))) #{}))
         ;; clone the mobs, set their :current-room to the keyword of this room which
         ;; we will post-process to assign the room's ref after the rooms are added.
         mobs (ref (or (into #{} (remove nil? (map #(mobs/clone-mob % id) (:mobs obj)))) #{}))
@@ -53,9 +46,15 @@
   them to the mire.rooms/rooms map."
   [dir]
   (dosync
+    ;; load all the rooms into the rooms ref
     (alter rooms load-rooms dir)
-    ;; update mobs in room to set their :current-room properly
-    (update-mobs-in-room)))
+
+    ;; Post Room Creation
+    ;; 1) Update mobs in room to set their :current-room to a room ref
+    ;; 2) Update all items in rooms to set their :parent to a room ref
+    (doseq [[k v] @mobs/mobs]
+      (let [r ((mobs/mobs k) :current-room)]
+        (ref-set r (rooms @r))))))
 
 (defn others-in-room
   "Other people in the current room"

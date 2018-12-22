@@ -49,11 +49,13 @@
   "Clone a Mob into a Room"
   [k room]
   (if-let [mob (mobs-db k)]
-    (let [items (ref (or (into #{} (remove nil? (map items/clone-item (:items mob)))) #{}))
-          id (generate-id k)]
+    (let [id (generate-id k)
+          items (ref (or (into #{} (remove nil? (map #(items/clone-item % id) (:items mob)))) #{}))]
       (dosync
-        (alter mobs conj { id (assoc mob :id id :created (quot (System/currentTimeMillis) 1000)
-                                         :current-room (ref room) :items items)})
+        (alter mobs conj { id (assoc mob :id id
+                                         :created (quot (System/currentTimeMillis) 1000)
+                                         :current-room (ref room)
+                                         :items items)})
         id))))
 
 (defn- create-mob

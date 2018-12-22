@@ -10,13 +10,13 @@
   (if (> (count args) 0)
     (let [thing (str/replace-first (str/join " " args) ":" "")
           k (keyword thing)]
-      (if-let [id (items/clone-item k)]
+      (if-let [id (items/clone-item k player/*name*)]
         (dosync
           (alter player/*inventory* conj id)
           (rooms/tell-others-in-room (str player/*name* " cloned a "
                                        (items/item-name (items/get-item id)) "."))
           (str "You cloned " (util/inspect-object (items/get-item id)) "."))
-        (if-let [id (mobs/clone-mob k (rooms/rooms (:id @player/*current-room*)))]
+        (if-let [id (mobs/clone-mob k @player/*current-room*)]
           (dosync
 
             (alter (player/*current-room* :mobs) conj id)

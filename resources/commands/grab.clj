@@ -31,6 +31,7 @@
               (util/move-between-refs id
                                       (:items @player/*current-room*)
                                       player/*inventory*)
+              (ref-set (:parent item) player/*name*)
               (rooms/tell-others-in-room (str player/*name* " picked up a " name "."))
               (str "You picked up the " name "."))
             (do
@@ -50,6 +51,7 @@
                     (util/move-between-refs id
                                             (:items from)
                                             player/*inventory*)
+                    (ref-set (:parent item) player/*name*)
                     (rooms/tell-others-in-room (str player/*name* " got a " (items/item-name item)
                                                  " out of a " (items/item-name from) "."))
                     (str "You got a " (items/item-name item) " out of a " (items/item-name from) ".")))

@@ -10,8 +10,14 @@
   "Get an item.  We sort map keys"
   [id]
   (if (contains? @items id)
-    (into (sorted-map) (id @items))
+    (id @items)
     nil))
+
+(defn remove-item
+  "Remove item k from object"
+  [obj k]
+  (dosync
+    (ref-set (:items obj) (set (remove #{k} @(:items obj))))))
 
 (defn generate-id
   "Generate IDs for Items"
@@ -67,20 +73,26 @@
 
 (defn clone-item
   "Clone an Item"
-  [k]
+  [k parent]
   (if-let [item (items-db k)]
     (let [id (generate-id k)]
       (dosync
-        (alter items conj { id (assoc item :id id :created (quot (System/currentTimeMillis) 1000))})
+        (if (:container item)
+          (alter items conj { id (assoc item :id id
+                                             :items (ref #{})
+                                             :created (quot (System/currentTimeMillis) 1000)
+                                             :parent (ref parent))})
+
+          (alter items conj { id (assoc item :id id
+                                             :created (quot (System/currentTimeMillis) 1000)
+                                             :parent (ref parent))}))
         id))))
 
 (defn- create-item
   "Create an item from a object"
   [items file obj]
   (let [id (keyword (:name obj))]
-    (if (:container obj)
-      (conj items {id (assoc obj :items (ref #{}) :category (str/replace (.getName file) ".clj" ""))})
-      (conj items {id (assoc obj :category (str/replace (.getName file) ".clj" ""))}))))
+    (conj items {id (assoc obj :category (str/replace (.getName file) ".clj" ""))})))
 
 (defn- load-item
   "Load a list of item objects from a file."

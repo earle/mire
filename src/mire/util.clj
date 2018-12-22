@@ -127,7 +127,7 @@
   [k]
   (if-let [mob (mobs/get-mob k)]
     (let [room (mob :current-room)
-          corpse (items/clone-item :corpse)]
+          corpse (items/clone-item :corpse (room :id))]
       (dosync
         ;; Move items from Mob to corpse
         (ref-set (:items (items/get-item corpse)) @(:items mob))
@@ -141,6 +141,29 @@
         ;; remove mob instance from world
         (alter mobs/mobs dissoc k)))))
 
+(defn destroy
+  "Destroy Something"
+  [k]
+  ;; Is this an Item?
+  (if-let [item (items/get-item k)]
+    (do
+      ;; Remove any children
+      (if-let [children (:items item)]
+        (doseq [obj @children]
+          (destroy obj)))
+
+      ;; Remove from any Player, Room, Mob, or other Item (container)
+      (if-let [parent @(item :parent)]
+        (doseq [obj (remove nil? [(items/get-item parent)
+                                  (mobs/get-mob parent)
+                                  (player/players (keyword parent))
+                                  (rooms/rooms parent)])]
+          (items/remove-item obj k)))
+      (dosync
+        (alter items/items dissoc k)
+        (log/debug "destroyed: " k))
+      true)
+    false))
 
 (defn move-mob
   "Move a mob in a direction (must exist)"

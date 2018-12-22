@@ -17,6 +17,7 @@
             (util/move-between-refs id
                                     player/*inventory*
                                     (:items @player/*current-room*))
+            (ref-set (:parent item) (player/*current-room* :id))
             (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
             (str "You dropped the " name ".")))
         (if (= thing "all")

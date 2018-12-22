@@ -30,7 +30,7 @@
                 (util/move-between-refs from
                                         (:items from-ref)
                                         (:items to))
-
+                (ref-set (:parent item) (:id to))
                 (rooms/tell-others-in-room (str player/*name* " put a " (items/item-name item)
                                              " into the " (items/item-name to) "."))
                 (str "You put a " (items/item-name item) " into the " (items/item-name to) ".")))
