@@ -22,19 +22,15 @@
 
         ;; ....or is it a Mob?
         (if-let [mob (mobs/get-mob k)]
-          ;; locate this mob, remove it from its rooms and destroy the instance
-          (dosync
-            ;; make sure the mobs current room is a real ref
+          (do
             (if (instance? clojure.lang.Ref (mob :current-room))
               (if-let [room (mob :current-room)]
-                (do
-                  ;; remove mob from room
-                  (alter ((mob :current-room) :mobs) disj k)
-                  (rooms/tell-room @room (str player/*name* " destroyed the "
-                                                  (mobs/mob-name mob) ".") player/*name*))))
-            ;; remove instance from the world
-            (alter mobs/mobs dissoc k)
+                (rooms/tell-room @room (str player/*name* " destroyed the "
+                                                    (mobs/mob-name mob) ".") player/*name*)))
+            ;; locate this mob, remove it from its rooms and destroy the instance
+            (util/destroy-mob k)
             (str "You destroyed:\n" (util/inspect-object mob) "."))
+
           ;; What is it?
           (str "Specify a valid thing to destroy."))))
     (str "Usage: 'destroy :keyword'")))

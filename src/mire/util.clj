@@ -141,16 +141,16 @@
         ;; remove mob instance from world
         (alter mobs/mobs dissoc k)))))
 
-(defn destroy
-  "Destroy Something"
+(defn destroy-item
+  "Destroy an Item instance"
   [k]
   ;; Is this an Item?
   (if-let [item (items/get-item k)]
     (do
-      ;; Remove any children
+      ;; Destroy any children
       (if-let [children (:items item)]
         (doseq [obj @children]
-          (destroy obj)))
+          (destroy-item obj)))
 
       ;; Remove from any Player, Room, Mob, or other Item (container)
       (if-let [parent @(item :parent)]
@@ -161,7 +161,29 @@
           (items/remove-item obj k)))
       (dosync
         (alter items/items dissoc k)
-        (log/debug "destroyed: " k))
+        (log/debug "destroy-item:" k))
+      true)
+    false))
+
+(defn destroy-mob
+  "Destroy a Mob instance"
+  [k]
+  (if-let [mob (mobs/get-mob k)]
+    (do
+      ;; Destroy any items being carried
+      (if-let [children (:items mob)]
+        (doseq [obj @children]
+          (destroy-item obj)))
+
+      ;; Remove Mob from current room
+      (if (instance? clojure.lang.Ref (mob :current-room))
+        (if-let [room (mob :current-room)]
+          (dosync
+            (alter ((mob :current-room) :mobs) disj k))))
+      ;; remove instance from the world
+      (dosync
+        (alter mobs/mobs dissoc k)
+        (log/debug "destroy-mob:" k))
       true)
     false))
 
