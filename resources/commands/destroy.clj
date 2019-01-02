@@ -18,7 +18,7 @@
           ;; remove it from its parent and destroy the instance
           (rooms/tell-others-in-room (str player/*name* " destroyed the "
                                           (items/item-name item) "."))
-          (str "You destroyed " (util/inspect-object item) "."))
+          (str "You destroyed the " (items/item-name item) "."))
 
         ;; ....or is it a Mob?
         (if-let [mob (mobs/get-mob k)]
@@ -29,7 +29,7 @@
                                                     (mobs/mob-name mob) ".") player/*name*)))
             ;; locate this mob, remove it from its rooms and destroy the instance
             (util/destroy-mob k)
-            (str "You destroyed:\n" (util/inspect-object mob) "."))
+            (str "You destroyed the " (mobs/mob-name mob) "."))
 
           ;; What is it?
           (str "Specify a valid thing to destroy."))))

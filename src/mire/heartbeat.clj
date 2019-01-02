@@ -48,6 +48,7 @@
           (if (> age halflife)
             ;; this item has decayed, inform room, remove from world.
             (log/debug "decay: " k "has decomposed:" pct)
+            ;; decay and rot
             (if (> pct 80.0)
               ;; if not marked as rotting, mark, and tell room
               (if (nil? (:rotted v))

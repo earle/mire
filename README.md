@@ -92,8 +92,8 @@ be organized by specific categories. Each item should have at a minimum a `:name
  { :name "battle-axe" :aliases [ "axe" "battle axe" ] :sdesc "bronze battle axe"}]
 ```
 
-Individual instances of items are cloned into `@items/items`. Each item is cloned given
-a keyword based on the items name, and the current number of items in the game.
+Individual instances of items are cloned into `@items/items`. Upon cloning, each item
+is given an `id` keyword based on the items name, and the current number of items in the game.
 
 ```Clojure
 user=> (:dagger-0 @items/items)
@@ -131,7 +131,7 @@ be organized as you see fit.
 Mobs can be set to move around using the keyword `moves`, the value of which is
 the chance that it moves (out of a 1000) during any given _Heartbeat_.
 
-`/resources/mobs/basic.clj.clj`
+`/resources/mobs/basic.clj`
 
 ```Clojure
 [{ :name "guard"
@@ -151,6 +151,34 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
 -   `:sdesc`: a short description of the mob
 -   `:items`: a ref set of item instances carried by this mob
 -   `:moves`: optional integer determining the rate this mob moves around
+
+#### Mob corpses
+
+When mobs are killed in game play, a corpse is created which contains the inventory
+of the mob. Corpse decay is handled as part of _Heartbeat_.
+
+```Clojure
+(defn kill-mob
+  "Kill a mob, creating a corpse"
+  [k]
+  (if-let [mob (mobs/get-mob k)]
+    (let [room (mob :current-room)
+          corpse (items/clone-item :corpse (room :id))]
+      (dosync
+        ;; Move items from Mob to corpse
+        (ref-set (:items (items/get-item corpse)) @(:items mob))
+
+        ;; Remove from :current-room, create a corpse in :current-room containing :items
+        (alter (room :mobs) disj k)
+        (alter items/items assoc-in [corpse :sdesc] (str (mobs/mob-name mob) " corpse"))
+        (alter items/items assoc-in [corpse :aliases] [(str (:name mob) " corpse"), (str (mobs/mob-name mob) " corpse")])
+        (alter (room :items) conj corpse)
+
+        ;; inform the room the mob has died
+        (rooms/tell-room @room (str "The " (mobs/mob-name mob) " has died from its wounds."))
+        ;; remove mob instance from world
+        (alter mobs/mobs dissoc k)))))
+```
 
 ## Heartbeat
 
