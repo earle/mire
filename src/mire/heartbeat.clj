@@ -25,10 +25,10 @@
           (if (< (rand-int 100) 5)
             (let [room (v :current-room)]
               (dosync
+                (log/debug "remove-mob: " k "from" (room :id))
                 ;; remove from room
                 (alter (room :mobs) disj k)
                 (rooms/tell-room @room (str "The " (mobs/mob-name v) " left."))
-                (log/debug "remove-mob: " k "from" (room :id))
                 ;; remove instance from the world
                 (alter mobs/mobs dissoc k))))))
 
@@ -46,23 +46,31 @@
               age (+ (- now (:created v)) 1)
               pct (float (* (/ age halflife) 100.0))]
           (if (> age halflife)
-            ;; this item has decayed, inform room, remove from world.
-            (log/debug "decay: " k "has decomposed:" pct)
+            (do
+              ;; this item has decayed, inform room, remove from world.
+              (if-let [room (util/find-room-for-item v)]
+                (rooms/tell-room room (str "The " (items/item-name v) " has decomposed.")))
+              (log/debug "decay: " k "has decomposed")
+              (util/destroy-item k))
+
             ;; decay and rot
-            (if (> pct 80.0)
+            (if (and (> pct 80.0) (nil? (:rotten v)))
               ;; if not marked as rotting, mark, and tell room
-              (if (nil? (:rotted v))
-                (dosync
-                  (alter items/items assoc-in [k :rotted] true)
-                  (alter items/items assoc-in [k :sdesc] (str "rotten " (items/item-name v)))
-                  (log/debug "decay:" k "has rotted")))
-              (if (> pct 40.0)
+              (dosync
+                (alter items/items assoc-in [k :rotten] true)
+                (alter items/items assoc-in [k :sdesc] (str "rotten " (items/item-name v)))
+                (if-let [room (util/find-room-for-item v)]
+                  (rooms/tell-room room (str "The " (items/item-name v) " has begun to rot.")))
+                (log/debug "decay:" k "has rotted"))
+
+              (if (and (> pct 40.0) (nil? (:decayed v)))
                 ;; if not marked as decayed, mark, and tell room
-                (if (nil? (:decayed v))
-                  (dosync
-                    (alter items/items assoc-in [k :decayed] true)
-                    (alter items/items assoc-in [k :sdesc] (str "decaying " (items/item-name v)))
-                    (log/debug "decay: " k "has decayed"))))))))
+                (dosync
+                  (alter items/items assoc-in [k :decayed] true)
+                  (alter items/items assoc-in [k :sdesc] (str "decaying " (items/item-name v)))
+                  (if-let [room (util/find-room-for-item v)]
+                    (rooms/tell-room room (str "The " (items/item-name v) " has started to decay.")))
+                  (log/debug "decay:" k "has decayed")))))))
 
       ;; generate mobs in rooms with players
       (doseq [[k v] @player/players]
@@ -73,7 +81,7 @@
             (if (< (count (util/find-mobs-in-room @room (name m))) (:max gen))
               ;; roll dice to see if we should generate one
               (if (< (rand-int 1000) (:rate gen))
-                (let [id (mobs/clone-mob m room)
+                (let [id (mobs/clone-mob m @room)
                       mob (mobs/get-mob id)]
                   (dosync
                     ;; add generation time to the mob instance

@@ -69,6 +69,23 @@
   [room name]
   (keyword (first (find-mobs-in-room room name))))
 
+(defn find-room-for-item
+  "The room an Item is in"
+  [item]
+  (if-let [k @(:parent item)]
+    ;; is it carried by a player?
+    (if-let [player (player/players (keyword k))]
+      @(player :current-room)
+      ;; is it carried by a mob?
+      (if-let [mob (mobs/get-mob k)]
+        @(mob :current-room)
+        ;; is it in a room?
+        (if-let [room (rooms/rooms k)]
+          room
+          ;; is it in an other item?
+          (find-room-for-item (items/get-item k)))))
+    nil))
+
 (defn ref-contains?
   "Does an ref's :items contain an object by this name?"
   [id thing]
@@ -120,7 +137,6 @@
     (ref-set from to)
     (rooms/tell-room to (str p " arrived.") p)
     (player/tell-player p (commands/execute "look"))))
-
 
 (defn kill-mob
   "Kill a mob, creating a corpse"
