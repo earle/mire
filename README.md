@@ -6,6 +6,7 @@ Hacking on this for fun -- originally forked from https://github.com/technomancy
 
 -   Support nth item commands to reference a specific item: `get dagger 3`
 -   An in-game editor (maybe: https://github.com/rohitpaulk/simple-editor) for editing objects
+-   In-game building via in-game editor
 -   Redis backend -- store and re-load world state
 -   User Accounts; login/signup/password reset
 -   Item based commands
