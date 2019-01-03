@@ -45,9 +45,10 @@
         (let [halflife (:decay v)
               age (+ (- now (:created v)) 1)
               pct (float (* (/ age halflife) 100.0))]
+
+          ;; this item has decayed, inform room, remove from world.
           (if (> age halflife)
             (do
-              ;; this item has decayed, inform room, remove from world.
               (if-let [room (util/find-room-for-item v)]
                 (rooms/tell-room room (str "The " (items/item-name v) " has decomposed.")))
               (log/debug "decay: " k "has decomposed")
@@ -55,7 +56,7 @@
 
             ;; decay and rot
             (if (and (> pct 80.0) (nil? (:rotten v)))
-              ;; if not marked as rotting, mark, and tell room
+              ;; mark as rotten, and tell room
               (dosync
                 (alter items/items assoc-in [k :rotten] true)
                 (alter items/items assoc-in [k :sdesc] (str "rotten " (items/item-name v)))
@@ -64,7 +65,7 @@
                 (log/debug "decay:" k "has rotted"))
 
               (if (and (> pct 40.0) (nil? (:decayed v)))
-                ;; if not marked as decayed, mark, and tell room
+                ;; mark as decayed, and tell room
                 (dosync
                   (alter items/items assoc-in [k :decayed] true)
                   (alter items/items assoc-in [k :sdesc] (str "decaying " (items/item-name v)))
@@ -74,8 +75,8 @@
 
       ;; generate mobs in rooms with players
       (doseq [[k v] @player/players]
-        ;; in every room with a player in it, which has :generate,
         (let [room (v :current-room)]
+          ;; in every room with a player in it, which has :generate...
           (doseq [[m gen] (room :generate)]
             ;; are there already max of this mob in this room?
             (if (< (count (util/find-mobs-in-room @room (name m))) (:max gen))
