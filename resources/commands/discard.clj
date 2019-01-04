@@ -13,13 +13,16 @@
         (let [id (util/find-item-in-ref player/*player* thing)
               item (items/get-item id)
               name (items/item-name item)]
-          (dosync
-            (util/move-between-refs id
-                                    player/*inventory*
-                                    (:items @player/*current-room*))
-            (ref-set (:parent item) (player/*current-room* :id))
-            (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
-            (str "You dropped the " name ".")))
+
+          (if (items/wielded? item)
+            (str "You must unwield it first.")
+            (dosync
+              (util/move-between-refs id
+                                      player/*inventory*
+                                      (:items @player/*current-room*))
+              (ref-set (:parent item) (player/*current-room* :id))
+              (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
+              (str "You dropped the " name "."))))
         (if (= thing "all")
           (str/join "\n" (for [[k obj] (util/items-in-ref player/*player*)] (discard [(:name obj)])))
           (str "You're not carrying a " thing "."))))

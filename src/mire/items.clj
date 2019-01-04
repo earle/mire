@@ -52,6 +52,20 @@
     (:moveable item)
     true))
 
+(defn wielded?
+  "Is this item currently wielded?"
+  [item]
+  (if (contains? item :wielded)
+    (:wielded item)
+    false))
+
+(defn worn?
+  "Is this item currently worn?"
+  [item]
+  (if (contains? item :worn)
+    (:worn item)
+    false))
+
 (defn item-name
   "Get the short description (display text) of an item"
   [item]
@@ -70,9 +84,9 @@
       (swap! name conj (:name item)))
 
     ;; is it worn or wielded?
-    (if (contains? item :worn)
+    (if (worn? item)
       (swap! postfix conj "(worn)")
-      (if (contains? item :wielded)
+      (if (wielded? item)
         (swap! postfix conj "(wielded)")))
 
     (str/join " " (concat @prefix @name @postfix))))

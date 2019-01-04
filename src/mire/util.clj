@@ -95,7 +95,6 @@
    "Is this player carrying something?"
   [thing]
   (ref-contains? player/*player* thing))
-  ;;(> (count (find-in-inventory thing)) 0))
 
 (defn room-contains?
   "Does this room contain something?"
