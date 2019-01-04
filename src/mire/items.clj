@@ -31,19 +31,19 @@
         (reset! k (keyword (str name "-" @n)))))
     @k))
 
-(defn container?
-  "Is this item a container of other items?"
-  [item]
-  (if (contains? item :container)
-    (:container item)
-    false))
-
 (defn contents
   "Contents of this item"
   [item]
   (if-let [objs @(:items item)]
     objs
     []))
+
+(defn container?
+  "Is this item a container of other items?"
+  [item]
+  (if (contains? item :container)
+    (:container item)
+    false))
 
 (defn moveable?
   "Is this item moveable?"
@@ -52,11 +52,11 @@
     (:moveable item)
     true))
 
-(defn wielded?
-  "Is this item currently wielded?"
+(defn wielding?
+  "Is this item currently wielding?"
   [item]
-  (if (contains? item :wielded)
-    (:wielded item)
+  (if (contains? item :wielding)
+    (:wielding item)
     false))
 
 (defn worn?
@@ -66,16 +66,57 @@
     (:worn item)
     false))
 
+(defn blessed?
+  "Is this item blessed?"
+  [item]
+  (if (contains? item :blessed)
+    (:blessed item)
+    false))
+
+(defn cursed?
+  "Is this item cursed?"
+  [item]
+  (if (contains? item :cursed)
+    (:cursed item)
+    false))
+
+(defn rotten?
+  "Is this item rotten?"
+  [item]
+  (if (contains? item :rotten)
+    (:rotten item)
+    false))
+
+(defn decaying?
+  "Is this item rotten?"
+  [item]
+  (if (contains? item :decaying)
+    (:decaying item)
+    false))
+
+(defn droppable?
+  "Can this item be dropped?"
+  [item]
+  (if (or (worn? item) (wielding? item))
+    false
+    true))
+
 (defn item-name
   "Get the short description (display text) of an item"
   [item]
   (let [prefix (atom ())
         name (atom ())
         postfix (atom ())]
+
+    (if (cursed? item)
+      (swap! prefix conj "cursed")
+      (if (blessed? item)
+        (swap! prefix conj "blessed")))
+
     ;; is it rotten or decaying?
-    (if (item :rotten)
+    (if (rotten? item)
       (swap! prefix conj "rotten")
-      (if (item :decayed)
+      (if (decaying? item)
         (swap! prefix conj "decaying")))
 
     ;; does it have a short description?
@@ -83,11 +124,11 @@
       (swap! name conj (:sdesc item))
       (swap! name conj (:name item)))
 
-    ;; is it worn or wielded?
+    ;; is it worn or being wielded?
     (if (worn? item)
       (swap! postfix conj "(worn)")
-      (if (wielded? item)
-        (swap! postfix conj "(wielded)")))
+      (if (wielding? item)
+        (swap! postfix conj "(wielding)")))
 
     (str/join " " (concat @prefix @name @postfix))))
 

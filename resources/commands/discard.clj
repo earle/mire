@@ -14,15 +14,17 @@
               item (items/get-item id)
               name (items/item-name item)]
 
-          (if (items/wielded? item)
-            (str "You must unwield it first.")
+          (if (items/droppable? item)
             (dosync
               (util/move-between-refs id
                                       player/*inventory*
                                       (:items @player/*current-room*))
               (ref-set (:parent item) (player/*current-room* :id))
               (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
-              (str "You dropped the " name "."))))
+              (str "You dropped the " name "."))
+            (if (items/wielding? item)
+              (str "You must unwield it first.")
+              (str "You must remove it first."))))
         (if (= thing "all")
           (str/join "\n" (for [[k obj] (util/items-in-ref player/*player*)] (discard [(:name obj)])))
           (str "You're not carrying a " thing "."))))

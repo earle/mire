@@ -15,13 +15,15 @@
         (let [id (util/find-item-in-ref player/*player* thing)
               item (items/get-item id)]
           ;; is this a weapon?
-          (if (items/wielded? item)
-            (do
-              (dosync
-                (alter items/items assoc-in [id :wielded] false))
-              (let [name (items/item-name (items/get-item id))]
-                (rooms/tell-others-in-room (str player/*name* " unwielded a " name "."))
-                (str "You stop wielding the " name ".")))
+          (if (items/wielding? item)
+            (if (not (items/cursed? item))
+              (do
+                (dosync
+                  (alter items/items assoc-in [id :wielding] false))
+                (let [name (items/item-name (items/get-item id))]
+                  (rooms/tell-others-in-room (str player/*name* " unwielded a " name "."))
+                  (str "You stop wielding the " name ".")))
+              (str "You can't, it's cursed."))
             (str "You aren't wielding the " (items/item-name item) ".")))
         (str "You're not carrying a " thing ".")))
     (str "What do you want to unwield?")))

@@ -21,9 +21,8 @@
           name (items/item-name item)]
       ;; Are we carrying this thing?
       (if (util/carrying? thing)
-        ;; Is it being wielded?
-        (if (items/wielded? item)
-          (str "You must unwield it first.")
+        ;; Is it droppable?
+        (if (items/droppable? item)
           (if-let [who (player/get-player (last args))]
             ;; Is this player in the current room?
             (if (contains? (rooms/others-in-room) (:name who))
@@ -45,6 +44,9 @@
                 (ref-set (:parent item) (:id mob))
                 (rooms/tell-others-in-room (str player/*name* " gave a " name " to the " (:name mob) "."))
                 (str "You gave a " name " to the " (:name mob) "."))
-              (str "There isn't a " (last args) " here."))))
+              (str "There isn't a " (last args) " here.")))
+          (if (items/wielding? item)
+            (str "You must unwield it first.")
+            (str "You must remove it first.")))
         (str "You dont have a " thing " to give.")))
     (str "What do you want to give, to whom?")))

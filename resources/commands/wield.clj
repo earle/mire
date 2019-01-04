@@ -19,7 +19,7 @@
           (if (item :weapon)
             (do
               (dosync
-                (alter items/items assoc-in [id :wielded] true))
+                (alter items/items assoc-in [id :wielding] true))
               (rooms/tell-others-in-room (str player/*name* " wielded a " name "."))
               (str "You wield the " name "."))
             (str "You can't wield the " name ".")))
