@@ -53,11 +53,29 @@
     true))
 
 (defn item-name
-  "Get the short description  of an item if it exists"
+  "Get the short description (display text) of an item"
   [item]
-  (if (contains? item :sdesc)
-    (:sdesc item)
-    (:name item)))
+  (let [prefix (atom ())
+        name (atom ())
+        postfix (atom ())]
+    ;; is it rotten or decaying?
+    (if (item :rotten)
+      (swap! prefix conj "rotten")
+      (if (item :decayed)
+        (swap! prefix conj "decaying")))
+
+    ;; does it have a short description?
+    (if (contains? item :sdesc)
+      (swap! name conj (:sdesc item))
+      (swap! name conj (:name item)))
+
+    ;; is it worn or wielded?
+    (if (contains? item :worn)
+      (swap! postfix conj "(worn)")
+      (if (contains? item :wielded)
+        (swap! postfix conj "(wielded)")))
+
+    (str/join " " (concat @prefix @name @postfix))))
 
 (defn item-desc
   "Get the description of an item, if it exists"

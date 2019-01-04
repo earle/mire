@@ -12,6 +12,7 @@
         k (keyword name)
         target (atom nil)]
     (do
+      ;; what is this exactly?
       (if-let [room (rooms/rooms k)]
         (reset! target room)
         (if-let [mob (mobs/get-mob k)]
@@ -21,6 +22,7 @@
             (if-let [player (player/get-player name)]
               (reset! target @(player :current-room))))))
 
+      ;; if we found a match, move the current player here
       (if @target
         (dosync
           (util/move-between-refs player/*name*

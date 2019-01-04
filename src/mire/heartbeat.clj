@@ -59,7 +59,6 @@
               ;; mark as rotten, and tell room
               (dosync
                 (alter items/items assoc-in [k :rotten] true)
-                (alter items/items assoc-in [k :sdesc] (str "rotten " (items/item-name v)))
                 (if-let [room (util/find-room-for-item v)]
                   (rooms/tell-room room (str "The " (items/item-name v) " has begun to rot.")))
                 (log/debug "decay:" k "has rotted"))
@@ -68,7 +67,6 @@
                 ;; mark as decayed, and tell room
                 (dosync
                   (alter items/items assoc-in [k :decayed] true)
-                  (alter items/items assoc-in [k :sdesc] (str "decaying " (items/item-name v)))
                   (if-let [room (util/find-room-for-item v)]
                     (rooms/tell-room room (str "The " (items/item-name v) " has started to decay.")))
                   (log/debug "decay:" k "has decayed")))))))
