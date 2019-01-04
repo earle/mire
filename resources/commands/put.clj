@@ -26,14 +26,17 @@
           ;; does the item we're moving exist in the room or inventory?
           (if-let [[from from-ref] (util/get-local thing)]
             (let [item (items/get-item from)]
-              (dosync
-                (util/move-between-refs from
-                                        (:items from-ref)
-                                        (:items to))
-                (ref-set (:parent item) (:id to))
-                (rooms/tell-others-in-room (str player/*name* " put a " (items/item-name item)
-                                             " into the " (items/item-name to) "."))
-                (str "You put a " (items/item-name item) " into the " (items/item-name to) ".")))
+              ;; is this item currently wielded?
+              (if (items/wielded? item)
+                (str "You must unwield it first.")
+                (dosync
+                  (util/move-between-refs from
+                                          (:items from-ref)
+                                          (:items to))
+                  (ref-set (:parent item) (:id to))
+                  (rooms/tell-others-in-room (str player/*name* " put a " (items/item-name item)
+                                               " into the " (items/item-name to) "."))
+                  (str "You put a " (items/item-name item) " into the " (items/item-name to) "."))))
             (str "There isn't any " thing " here."))
           (str "You can't put things into the " (items/item-name to) "."))
         (str "There isn't any " target " here.")))))
