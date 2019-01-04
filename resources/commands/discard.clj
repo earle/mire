@@ -13,7 +13,7 @@
         (let [id (util/find-item-in-ref player/*player* thing)
               item (items/get-item id)
               name (items/item-name item)]
-
+          ;; can we derop this item?
           (if (items/droppable? item)
             (dosync
               (util/move-between-refs id

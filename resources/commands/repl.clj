@@ -10,7 +10,7 @@
             [nrepl.core :as nrepl]
             [reply.main :as reply]))
 
-(defn !repl
+(defn repl
   "Launch a REPL"
   [args]
   (binding [*err* *out*]

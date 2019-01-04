@@ -27,7 +27,7 @@ server. Then players can connect by telnetting to port 3333.
 
 There are four main types of in-game objects: _Rooms_, _Items_, _Mobs_, and _Players_.
 
-### Rooms
+## Rooms
 
 Rooms are defined in files in `resources/rooms/`. Rooms are loaded into the
 `@rooms/rooms` reference. Each file can contain multiple room objects so rooms can
@@ -60,7 +60,7 @@ in _Mob Generation_.
    :exits {:west :hallway :east :forest}}]
 ```
 
-#### Mob Generation
+### Mob Generation
 
 Rooms can generate mobs while `:inhabitants` contains at least one _Player_. Mob generation
 is handled as part of the system _Heartbeat_. The `:generate` keyword takes a map describing
@@ -79,7 +79,7 @@ To generate mobs in a room:
              :raccoon {:max 3 :rate 45}}}]
 ```
 
-#### Room Attributes
+### Room Attributes
 
 -   `:id`: the keyword to uniquely identify a room
 -   `:area`: a string to name the area of the world a room is in (_calculated from filename_)
@@ -90,7 +90,7 @@ To generate mobs in a room:
 -   `:mobs`: mobs that should be cloned into this room when its initialized
 -   `:generate`: map describing mobs to generate in this room
 
-### Items
+## Items
 
 Items are defined in files in `resources/items/`. Items are loaded into the
 `@items/items-db` reference. Each file can contain multiple item objects so they can
@@ -111,16 +111,20 @@ user=> (:dagger-0 @items/items)
 {:name "dagger", :sdesc "small dagger", :id :dagger-0}
 ```
 
-#### Item Attributes
+### Item Attributes
 
 -   `:id`: a keyword to uniquely identify a specific instance of an item (_generated upon cloning_) _required_
 -   `:sdesc`: a short description of the item _required_
+-   `:name`: a name to display this item based on its attributes
 -   `:aliases`: a list of strings to access an instance of this item in gameplay
 -   `:category`: a string to categorize an item (_calculated from filename_)
 -   `:container`: boolean if this item can contain other Items
 -   `:decay`: seconds that it takes for this item to decay &ndash; _corpses, food, etc_
--   `:name`: a string and unique name for this item
+-   `:decayed`: boolean if this item is decayed
+-   `:rotten`: boolean if this item is rotten
 -   `:moveable`: boolean if this item can be picked up or not
+-   `:blessed`: boolean if this item is blessed
+-   `:cursed`: boolean if this item is cursed (can't be removed once used)
 
 ```Clojure
 > look
@@ -133,7 +137,7 @@ You see large trunk, which contains:
 2 red roses.
 ```
 
-### Mobs
+## Mobs
 
 Mobs are defined in files in `resources/mobs/`. Mobs are loaded into the
 `@mobs/mobs` reference. Each file can contain multiple mob objects so mobs can
@@ -153,7 +157,7 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
  { :name "rat" :aliases [ "rat", "rodent"] :sdesc "small rat"}]
 ```
 
-#### Mob Attributes
+### Mob Attributes
 
 -   `:id`: a keyword to uniquely identify a specific instance (_generated upon cloning_)
 -   `:name`: a string and unique name for this mob
@@ -163,7 +167,7 @@ the chance that it moves (out of a 1000) during any given _Heartbeat_.
 -   `:items`: a ref set of item instances carried by this mob
 -   `:moves`: optional integer determining the rate this mob moves around
 
-#### Mob corpses
+### Mob corpses
 
 When mobs are killed in game play, a corpse is created which contains the inventory
 of the mob. Corpse decay is handled as part of _Heartbeat_.
@@ -221,13 +225,19 @@ Example command `discard`:
       (if (util/carrying? thing)
         (let [id (util/find-item-in-ref player/*player* thing)
               item (items/get-item id)
-              name (items/item-name item)]
-          (dosync
-            (util/move-between-refs id
-                                    player/*inventory*
-                                    (:items @player/*current-room*))
-            (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
-            (str "You dropped the " name ".")))
+              name (items/item-name item)]  
+          ;; can we derop this item?
+          (if (items/droppable? item)
+            (dosync
+              (util/move-between-refs id
+                                      player/*inventory*
+                                      (:items @player/*current-room*))
+              (ref-set (:parent item) (player/*current-room* :id))
+              (rooms/tell-others-in-room (str player/*name* " dropped a " name "."))
+              (str "You dropped the " name "."))
+            (if (items/wielding? item)
+              (str "You must unwield it first.")
+              (str "You must remove it first."))))
         (if (= thing "all")
           (str/join "\n" (for [[k obj] (util/items-in-ref player/*player*)] (discard [(:name obj)])))
           (str "You're not carrying a " thing "."))))
@@ -235,6 +245,15 @@ Example command `discard`:
 ```
 
 ## Wiz
+
+-   `!!`: repeat the last command
+-   `alter`: alter the instance of something
+-   `clone`: clone an instance of something
+-   `destroy`: destroy an instance of something
+-   `goto`: goto an instance of something
+-   `inspect`: inspect an instance of something
+-   `reload-command`: reload a commmand from file on disk
+-   `repl`: in-game REPL &ndash; _nREPL runs on port 7888_
 
 ### Cloning
 
@@ -299,6 +318,8 @@ You cloned {:id :dagger-2, :name "dagger", :sdesc "small dagger"}.
 > alter :dagger-2 :sdesc "a magic dagger"
 :dagger-2 {:name "dagger", :sdesc "a magic dagger", :id :dagger-2}
 ```
+
+## Building
 
 ## Motivation
 
