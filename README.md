@@ -4,14 +4,15 @@ Hacking on this for fun -- originally forked from https://github.com/technomancy
 
 ## TODO
 
--   Support nth item commands to reference a specific item: `get dagger 3`
--   An in-game editor (maybe: https://github.com/rohitpaulk/simple-editor) for editing objects
--   In-game building via in-game editor
+-   Support nth item in commands (get, discard, put, etc) to reference a specific item: `get dagger 3`
+-   An in-game editor (maybe start with: https://github.com/rohitpaulk/simple-editor)
+-   In-game building (rooms, items, mobs)
 -   Redis backend -- store and re-load world state
 -   User Accounts; login/signup/password reset
 -   Item based commands
+-   Wiz/Account based Commands
 -   Character schemas
--   Combat
+-   Weapons, Armor, Combat?
 
 ## Usage
 

@@ -27,16 +27,24 @@
     (commute (:inhabitants @player/*current-room*) disj player/*name*)))
 
 (defn- get-unique-player-name [s]
-  (let [name (str/capitalize s)]
-    (if (@player/streams name)
-      (do (print "That name is in use; try again: ")
+  (if (< (count s) 3)
+    (do
+      (print "Choose a longer name; try again: ")
+      (flush)
+      (recur (read-line)))
+    (if (not (re-matches #"^[a-zA-Z]+$" s))
+      (do
+        (print "Names can contain only letters; try again: ")
         (flush)
         (recur (read-line)))
-      (if (< (count name) 2)
-        (do (print "Choose a longer name; try again: ")
-          (flush)
-          (recur (read-line)))
-        name))))
+      ;; we got good input, does this player exist?
+      (let [name (str/capitalize s)]
+        (if (@player/streams name)
+          (do
+            (print "That name is in use; try again: ")
+            (flush)
+            (recur (read-line)))
+          name)))))
 
 (defn- mire-handle-client [in out]
   (binding [*in* (io/reader in)

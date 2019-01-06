@@ -44,6 +44,21 @@
   []
   (select-keys @items/items @*inventory*))
 
+(defn one-hand-free?
+  "Does this player have a hand free?"
+  []
+  (let [held (filter items/wielding? (map items/get-item @*inventory*))]
+    (if (> (count (filter #(:two-handed %) held)) 0)
+      false
+      (if (< (count held) 2)
+        true
+        false))))
+
+(defn both-hands-free?
+  "Does this player have both hands free?"
+  []
+  (= (count (filter items/wielding? (map items/get-item @*inventory*))) 0))
+
 (defn tell-player
   "Send a message to a specific player."
   [player message]

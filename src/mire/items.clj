@@ -2,9 +2,10 @@
   (:require [clojure.string :as str]
             [clojure.tools.logging :as log]))
 
-; All items that exist, and the database of items to clone instances from
+; All item instances that exist in the world
 (def items (ref {}))
-(def items-db (ref {}))
+; A database of items to clone instances from with defaults
+(def items-db (ref { :corpse {:name "corpse", :sdesc "corpse", :container true, :decay 300, :category "misc"}}))
 
 (defn get-item
   "Get an item.  We sort map keys"

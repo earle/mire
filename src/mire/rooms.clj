@@ -5,8 +5,13 @@
             [mire.items :as items]
             [mire.mobs :as mobs]))
 
-;; state for all rooms
-(def rooms (ref {}))
+;; Ref containing all rooms in the world
+(def rooms (ref { :void {:id :void
+                         :desc "You're stuck in the void."
+                         :exits (ref {:north :start})
+                         :inhabitants (ref #{})
+                         :mobs (ref #{})
+                         :items (ref #{})}}))
 
 (defn- create-room
   "Create a room from a object"

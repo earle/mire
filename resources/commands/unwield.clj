@@ -19,7 +19,7 @@
             (if (not (items/cursed? item))
               (do
                 (dosync
-                  (alter items/items assoc-in [id :wielding] false))
+                  (alter items/items assoc id (dissoc item :wielding)))
                 (let [name (items/item-name (items/get-item id))]
                   (rooms/tell-others-in-room (str player/*name* " unwielded a " name "."))
                   (str "You stop wielding the " name ".")))
