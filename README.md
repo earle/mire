@@ -7,7 +7,7 @@ Hacking on this for fun -- originally forked from https://github.com/technomancy
 -   Support nth item in commands (get, discard, put, etc) to reference a specific item: `get dagger 3`
 -   An in-game editor (maybe start with: https://github.com/rohitpaulk/simple-editor)
 -   In-game building (rooms, items, mobs)
--   Redis backend -- store and re-load world state
+-   DB backend -- store and re-load world state
 -   User Accounts; login/signup/password reset
 -   Item based commands
 -   Wiz/Account based Commands
