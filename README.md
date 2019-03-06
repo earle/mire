@@ -9,6 +9,7 @@ Hacking on this for fun -- originally forked from https://github.com/technomancy
 -   In-game building (rooms, items, mobs)
 -   DB backend -- store and re-load world state
 -   User Accounts; login/signup/password reset
+-   Move command aliases into command files
 -   Item based commands
 -   Wiz/Account based Commands
 -   Character schemas
